@@ -1,4 +1,4 @@
-export type SetType = 'normal' | 'warmup' | 'drop' | 'failure';
+export type SetType = 'warmup' | 'normal' | 'failure' | 'drop_set' | 'cluster' | 'myo_reps';
 
 export interface WorkoutSet {
   set_type: SetType;
@@ -20,8 +20,10 @@ export interface ExerciseItem {
   order: number;
   source_name: string;
   name_en: string;
-  name_zh: string;
+  name_zh?: string;
   canonical_name: string | null;
+  target_muscle?: string;
+  target_muscle_zh?: string;
   image_url?: string;
   sets: WorkoutSet[];
   repeat_sets: number;
