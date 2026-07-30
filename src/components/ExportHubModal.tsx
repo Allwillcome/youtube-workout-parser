@@ -95,7 +95,7 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
           </h2>
           
           <p className="text-xs text-zinc-400">
-            {lang === 'zh' ? '已生成专属链接。支持一键复制 URL、生成刷卡卡片或导出到 Notion / JSON。' : 'Copy unique share link, generate gym check-in sheets, or export to Notion.'}
+            {lang === 'zh' ? '已生成专属链接。支持一键复制 URL、生成刷卡卡片或导出排版文本 / JSON。' : 'Copy unique share link, generate gym check-in sheets, or export formatted text.'}
           </p>
         </div>
 
@@ -147,12 +147,12 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
             </button>
           </div>
 
-          {/* Action 2: Copy for Notion */}
+          {/* Action 2: Copy Text */}
           <div className="p-3.5 bg-zinc-950 border border-zinc-800 rounded-md space-y-2 flex flex-col justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-zinc-400" />
-                <span className="text-xs font-bold text-zinc-200">{lang === 'zh' ? '复制到 Notion' : 'Copy for Notion'}</span>
+                <span className="text-xs font-bold text-zinc-200">{lang === 'zh' ? '复制文本' : 'Copy Text'}</span>
               </div>
               <p className="text-[11px] text-zinc-500">
                 {lang === 'zh' ? '排版纯文本备忘录' : 'Formatted plain text'}

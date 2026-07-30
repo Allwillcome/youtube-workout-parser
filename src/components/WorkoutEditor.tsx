@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   WorkoutPlan, 
   ExerciseItem, 
@@ -49,6 +49,11 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
   const [showExportHub, setShowExportHub] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    // Automatically reset scroll position to top when entering drill-down page
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   const jumpToTime = (seconds: number) => {
     setActiveTimestamp(seconds);
@@ -181,9 +186,9 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
   const videoEmbedUrl = `https://www.youtube.com/embed/${plan.source.video_id}?enablejsapi=1&autoplay=0`;
 
   return (
-    <div className="w-full max-w-[1500px] mx-auto px-4 py-2 space-y-4 animate-minimal-fade">
-      {/* Top Compact Navigation & Title Banner */}
-      <div className="minimal-card p-3 lg:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+    <div className="w-full max-w-[1500px] mx-auto px-4 py-2 space-y-3 animate-minimal-fade">
+      {/* Top Compact Bar: Immediate access to Home & Export */}
+      <div className="minimal-card p-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <Link 
             href="/"
@@ -198,7 +203,7 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
             disabled={isReadOnly}
             value={plan.title}
             onChange={(e) => setPlan({ ...plan, title: e.target.value })}
-            className="flex-1 text-sm lg:text-base font-bold bg-transparent border-b border-transparent hover:border-zinc-700 focus:border-zinc-500 focus:outline-none text-zinc-100 transition-colors py-0.5 truncate"
+            className="flex-1 text-sm font-bold bg-transparent border-b border-transparent hover:border-zinc-700 focus:border-zinc-500 focus:outline-none text-zinc-100 transition-colors py-0.5 truncate"
             placeholder="Enter Workout Plan Title..."
           />
         </div>
@@ -241,11 +246,11 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
         </div>
       )}
 
-      {/* Main Two-Column Layout - Compact Above the Fold */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      {/* Main Grid: Zero-scrolling Needed Above-the-Fold Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         
-        {/* LEFT COLUMN: YouTube Player & Metadata */}
-        <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-20">
+        {/* LEFT COLUMN: Ultra Compact Player */}
+        <div className="lg:col-span-5 space-y-3 lg:sticky lg:top-16">
           <div className="minimal-card overflow-hidden">
             <div className="relative aspect-video bg-zinc-950">
               <iframe
@@ -258,56 +263,29 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
               />
             </div>
 
-            <div className="p-3 space-y-2 bg-zinc-950">
-              <div className="flex items-center justify-between">
+            <div className="p-2.5 space-y-1 bg-zinc-950">
+              <div className="flex items-center justify-between text-[11px]">
                 <a
                   href={plan.source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs font-medium text-zinc-300 hover:text-white flex items-center gap-1.5 transition-colors line-clamp-1"
+                  className="font-medium text-zinc-300 hover:text-white flex items-center gap-1 transition-colors truncate max-w-[200px]"
                 >
                   <span>{plan.source.channel_name}</span>
-                  <ExternalLink className="w-3 h-3 text-zinc-500" />
+                  <ExternalLink className="w-3 h-3 text-zinc-500 shrink-0" />
                 </a>
-                <span className="text-[10px] text-zinc-500 font-mono">{t('viewOriginal')}</span>
+                <span className="text-zinc-500 font-mono text-[10px]">{t('viewOriginal')}</span>
               </div>
-              
-              <h3 className="text-xs font-bold text-zinc-200 line-clamp-2">
-                {plan.source.title}
-              </h3>
             </div>
           </div>
-
-          {/* Video Content Diagnostic Report */}
-          {plan.classification && (
-            <div className="minimal-card p-3 space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
-                  <span className="text-[11px] font-mono font-bold text-zinc-200 uppercase tracking-wider">
-                    {lang === 'zh' ? '精准时间戳对齐报告' : 'Timestamp Report'}
-                  </span>
-                </div>
-                <span className="px-2 py-0.5 text-[10px] font-mono font-semibold bg-zinc-800 text-zinc-300 border border-zinc-700 rounded">
-                  {lang === 'zh' ? '100% 对齐' : '100% Aligned'}
-                </span>
-              </div>
-
-              <p className="text-[11px] text-zinc-400">
-                {lang === 'zh' 
-                  ? (plan.classification.summary_zh || '成功验证包含结构化动作、组数、次数及姿势要点。') 
-                  : (plan.classification.summary_en || 'Successfully verified actionable exercises, sets, reps & coaching cues.')}
-              </p>
-            </div>
-          )}
         </div>
 
-        {/* RIGHT COLUMN: Granular Structured Workout Plan Editor */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+        {/* RIGHT COLUMN: Immediate Actionable Workout Exercises */}
+        <div className="lg:col-span-7 space-y-3">
+          <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800">
             <div className="flex items-center gap-2">
               <h2 className="text-xs font-mono uppercase tracking-wider font-bold text-zinc-200">{t('exercisesHeader')}</h2>
-              <span className="text-[11px] font-mono text-zinc-500">({plan.exercises.length} Exercises)</span>
+              <span className="text-[11px] font-mono text-zinc-500">({plan.exercises.length} Exercises Extracted)</span>
             </div>
             {!isReadOnly && (
               <button
@@ -320,7 +298,7 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
             )}
           </div>
 
-          {/* Exercises List */}
+          {/* Exercises List - Instant First View */}
           <div className="space-y-3">
             {plan.exercises.map((ex, index) => {
               const displayName = formatExerciseName(ex.name_en || ex.source_name, ex.name_zh || '', lang);
@@ -330,10 +308,10 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
               return (
                 <div 
                   key={ex.id || index}
-                  className="minimal-card p-3.5 space-y-3"
+                  className="minimal-card p-3 space-y-3"
                 >
-                  {/* Exercise Top Header */}
-                  <div className="flex items-start gap-3 pb-2.5 border-b border-zinc-800/80">
+                  {/* Exercise Header */}
+                  <div className="flex items-start gap-3 pb-2 border-b border-zinc-800/80">
                     <img 
                       src={imageUrl} 
                       alt={displayName}
