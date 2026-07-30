@@ -10,7 +10,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 px-4 lg:px-8 py-3.5 flex items-center justify-between">
-      <Link href="/" className="flex items-center gap-3 group">
+      <Link href="/" className="flex items-center gap-3 group btn-tactile">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
           <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
             <Dumbbell className="w-5 h-5 text-indigo-400 group-hover:rotate-12 transition-transform" />
@@ -30,10 +30,10 @@ export function Navbar() {
       </Link>
 
       <div className="flex items-center gap-3">
-        {/* Language Switcher Button */}
+        {/* Language Switcher Button with Tactile Active Feedback */}
         <button
           onClick={() => setLang(lang === 'en' ? 'zh' : 'en')}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 hover:text-white rounded-lg transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 hover:text-white rounded-xl btn-tactile shadow-sm"
           title="Switch Language / 切换语言"
         >
           <Globe className="w-3.5 h-3.5 text-indigo-400" />

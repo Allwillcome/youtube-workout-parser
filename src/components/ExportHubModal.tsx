@@ -29,14 +29,12 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
 
   const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/workouts/${plan.slug}` : `/workouts/${plan.slug}`;
 
-  // Copy share URL
   const copyLink = () => {
     navigator.clipboard.writeText(shareUrl);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  // Copy Markdown / Notion formatted text
   const copyFormattedText = () => {
     const textLines = [
       `🏋️‍♂️ ${plan.title}`,
@@ -61,26 +59,25 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
     setTimeout(() => setCopiedText(false), 2000);
   };
 
-  // Copy raw JSON
   const copyJson = () => {
     navigator.clipboard.writeText(JSON.stringify(plan, null, 2));
     setCopiedJson(true);
     setTimeout(() => setCopiedJson(false), 2000);
   };
 
-  // Trigger browser print for gym workout log card
   const handlePrint = () => {
     window.print();
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 lg:p-8 max-w-2xl w-full space-y-6 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-200">
+      {/* Modal Container: Scale in from 0.95 (Never scale 0) */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 lg:p-8 max-w-2xl w-full space-y-6 shadow-2xl relative overflow-hidden animate-scale-in">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors"
+          className="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 btn-tactile"
         >
           <X className="w-5 h-5" />
         </button>
@@ -99,11 +96,11 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
           </p>
         </div>
 
-        {/* Main Export Grid (4 High-Value Real Actions) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Main Export Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger-cascade">
           
           {/* Action 1: Share Link */}
-          <div className="bg-slate-950/80 border border-slate-800 hover:border-indigo-500/50 p-4 rounded-2xl space-y-3 transition-colors">
+          <div className="bg-slate-950/80 border border-slate-800 hover:border-indigo-500/50 p-4 rounded-2xl space-y-3 card-hover-lift">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
@@ -117,7 +114,7 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
             </p>
             <button
               onClick={copyLink}
-              className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
+              className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl btn-tactile shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2"
             >
               {copiedLink ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
               <span>{copiedLink ? (lang === 'zh' ? '已复制分享链接' : 'Link Copied!') : (lang === 'zh' ? '复制分享链接' : 'Copy Share Link')}</span>
@@ -125,7 +122,7 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
           </div>
 
           {/* Action 2: Printable Gym Check-in Sheet */}
-          <div className="bg-slate-950/80 border border-slate-800 hover:border-purple-500/50 p-4 rounded-2xl space-y-3 transition-colors">
+          <div className="bg-slate-950/80 border border-slate-800 hover:border-purple-500/50 p-4 rounded-2xl space-y-3 card-hover-lift">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center font-bold text-xs">
@@ -139,7 +136,7 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
             </p>
             <button
               onClick={handlePrint}
-              className="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-600/20"
+              className="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl btn-tactile shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2"
             >
               <Printer className="w-4 h-4" />
               <span>{lang === 'zh' ? '打印/导出刷卡卡片' : 'Print Gym Log Sheet'}</span>
@@ -147,7 +144,7 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
           </div>
 
           {/* Action 3: Copy Text for Notion / Notes */}
-          <div className="bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 p-4 rounded-2xl space-y-3 transition-colors">
+          <div className="bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 p-4 rounded-2xl space-y-3 card-hover-lift">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
@@ -161,7 +158,7 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
             </p>
             <button
               onClick={copyFormattedText}
-              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 text-xs font-bold rounded-xl btn-tactile flex items-center justify-center gap-2"
             >
               {copiedText ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               <span>{copiedText ? (lang === 'zh' ? '已复制文本' : 'Text Copied!') : (lang === 'zh' ? '复制排版文本' : 'Copy Text')}</span>
@@ -169,7 +166,7 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
           </div>
 
           {/* Action 4: Download JSON */}
-          <div className="bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl space-y-3 transition-colors">
+          <div className="bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl space-y-3 card-hover-lift">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center font-bold text-xs">
@@ -183,7 +180,7 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
             </p>
             <button
               onClick={copyJson}
-              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold rounded-xl btn-tactile flex items-center justify-center gap-2"
             >
               {copiedJson ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               <span>{copiedJson ? (lang === 'zh' ? '已复制 JSON' : 'JSON Copied!') : (lang === 'zh' ? '复制 JSON' : 'Copy JSON')}</span>
@@ -196,7 +193,7 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
         <div className="flex justify-end pt-2">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-colors"
+            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl btn-tactile"
           >
             {lang === 'zh' ? '关闭' : 'Close'}
           </button>

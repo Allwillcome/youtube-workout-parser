@@ -37,7 +37,6 @@ export default function HomePage() {
   
   const [currentPlan, setCurrentPlan] = useState<WorkoutPlan | null>(null);
 
-  // Filter courses by selected creator
   const filteredCourses = selectedCreator === 'all' 
     ? RECOMMENDED_COURSES 
     : RECOMMENDED_COURSES.filter(c => c.creator.includes(selectedCreator));
@@ -97,11 +96,11 @@ export default function HomePage() {
 
       <main className="flex-1 flex flex-col items-center">
         {!currentPlan ? (
-          <div className="w-full max-w-6xl px-4 lg:px-8 py-12 lg:py-16 space-y-12">
+          <div className="w-full max-w-6xl px-4 lg:px-8 py-12 lg:py-16 space-y-12 animate-scale-in">
             
             {/* Hero Section */}
             <div className="text-center space-y-5 max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/20 text-xs font-semibold text-indigo-400">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/20 text-xs font-semibold text-indigo-400 shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
                 <span>{t('heroBadge')}</span>
               </div>
@@ -142,7 +141,7 @@ export default function HomePage() {
                   <button
                     onClick={() => handleParse()}
                     disabled={isParsing}
-                    className="flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95 disabled:opacity-50 shrink-0"
+                    className="flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-600/30 btn-tactile disabled:opacity-50 shrink-0"
                   >
                     {isParsing ? (
                       <>
@@ -164,14 +163,14 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="text-xs font-semibold text-slate-400 hover:text-indigo-400 flex items-center gap-1.5 transition-colors"
+                  className="text-xs font-semibold text-slate-400 hover:text-indigo-400 flex items-center gap-1.5 transition-colors btn-tactile"
                 >
                   <Key className="w-3.5 h-3.5" />
                   <span>{showAdvanced ? 'Hide Advanced Options' : t('advancedOptions')}</span>
                 </button>
 
                 {showAdvanced && (
-                  <div className="mt-4 p-4 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-4">
+                  <div className="mt-4 p-4 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-4 animate-scale-in">
                     <div className="space-y-1.5">
                       <label className="text-xs font-semibold text-slate-300">{t('apiKeyLabel')}</label>
                       <input
@@ -207,7 +206,7 @@ export default function HomePage() {
 
               {/* Loading Status Progress */}
               {isParsing && (
-                <div className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl space-y-2 text-center">
+                <div className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl space-y-2 text-center animate-scale-in">
                   <div className="flex items-center justify-center gap-2 text-xs font-semibold text-indigo-300">
                     <Sparkles className="w-4 h-4 animate-spin text-indigo-400" />
                     <span>{parseStep}</span>
@@ -234,37 +233,37 @@ export default function HomePage() {
                 <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs self-start sm:self-auto">
                   <button
                     onClick={() => setSelectedCreator('all')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all ${selectedCreator === 'all' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium btn-tactile ${selectedCreator === 'all' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                   >
                     {lang === 'zh' ? '全部 (9)' : 'All (9)'}
                   </button>
                   <button
                     onClick={() => setSelectedCreator('Jeff')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all ${selectedCreator === 'Jeff' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium btn-tactile ${selectedCreator === 'Jeff' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                   >
                     Jeff Nippard
                   </button>
                   <button
                     onClick={() => setSelectedCreator('Mike')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all ${selectedCreator === 'Mike' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium btn-tactile ${selectedCreator === 'Mike' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                   >
                     Mike Israetel
                   </button>
                   <button
                     onClick={() => setSelectedCreator('Layne')}
-                    className={`px-3 py-1.5 rounded-lg font-medium transition-all ${selectedCreator === 'Layne' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-3 py-1.5 rounded-lg font-medium btn-tactile ${selectedCreator === 'Layne' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                   >
                     Layne Norton
                   </button>
                 </div>
               </div>
 
-              {/* Course Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Course Cards Grid with Emil's Card Hover Lift & Stagger Cascade */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 stagger-cascade">
                 {filteredCourses.map((course) => (
                   <div
                     key={course.id}
-                    className="bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/50 p-5 rounded-2xl space-y-4 transition-all flex flex-col justify-between group shadow-xl"
+                    className="bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/50 p-5 rounded-2xl space-y-4 card-hover-lift flex flex-col justify-between group shadow-xl"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -305,7 +304,7 @@ export default function HomePage() {
                         setUrl(course.url);
                         handleParse(course.url);
                       }}
-                      className="w-full mt-4 py-2.5 bg-slate-950 hover:bg-indigo-600/20 border border-slate-800 hover:border-indigo-500/30 text-indigo-400 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 group-hover:text-white"
+                      className="w-full mt-4 py-2.5 bg-slate-950 hover:bg-indigo-600/20 border border-slate-800 hover:border-indigo-500/30 text-indigo-400 text-xs font-bold rounded-xl btn-tactile flex items-center justify-center gap-2 group-hover:text-white"
                     >
                       <Play className="w-3.5 h-3.5 fill-indigo-400 group-hover:fill-white transition-colors" />
                       <span>{lang === 'zh' ? '解析该教程训练计划' : 'Parse This Tutorial'}</span>
@@ -317,7 +316,7 @@ export default function HomePage() {
 
             {/* Feature Architecture Highlights */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-900">
-              <div className="p-5 bg-slate-900/40 border border-slate-800/60 rounded-2xl space-y-2">
+              <div className="p-5 bg-slate-900/40 border border-slate-800/60 rounded-2xl space-y-2 card-hover-lift">
                 <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-xs">
                   1
                 </div>
@@ -325,7 +324,7 @@ export default function HomePage() {
                 <p className="text-xs text-slate-400">Classifies content first (is_actionable), then extracts exercises, sets, reps & timestamped cues.</p>
               </div>
 
-              <div className="p-5 bg-slate-900/40 border border-slate-800/60 rounded-2xl space-y-2">
+              <div className="p-5 bg-slate-900/40 border border-slate-800/60 rounded-2xl space-y-2 card-hover-lift">
                 <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-xs">
                   2
                 </div>
@@ -333,7 +332,7 @@ export default function HomePage() {
                 <p className="text-xs text-slate-400">Prevents AI hallucinations by auditing non-negatives, set rules, superset logic and unresolved items.</p>
               </div>
 
-              <div className="p-5 bg-slate-900/40 border border-slate-800/60 rounded-2xl space-y-2">
+              <div className="p-5 bg-slate-900/40 border border-slate-800/60 rounded-2xl space-y-2 card-hover-lift">
                 <div className="w-8 h-8 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 font-bold text-xs">
                   3
                 </div>
@@ -344,12 +343,12 @@ export default function HomePage() {
 
           </div>
         ) : (
-          <div className="w-full">
+          <div className="w-full animate-scale-in">
             <div className="bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center justify-between text-xs">
               <span className="text-slate-400">Editing Plan: <strong className="text-white">{currentPlan.title}</strong></span>
               <button 
                 onClick={() => setCurrentPlan(null)}
-                className="text-indigo-400 hover:underline font-medium"
+                className="text-indigo-400 hover:underline font-medium btn-tactile"
               >
                 ← Parse Another Video
               </button>
