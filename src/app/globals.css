@@ -1,10 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  /* Vanguard / Taste Agency Easing & Color Tokens */
-  --ease-fluid: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* Minimalist Utilitarian Easing & Zinc Monochrome Palette */
+  --ease-clean: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-fast: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 @layer utilities {
@@ -19,77 +18,67 @@
     pointer-events: none !important;
   }
 
-  /* Ethereal OLED Mesh Gradient Background */
-  .bg-ethereal-mesh {
-    background-color: #030712;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
-      radial-gradient(at 50% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+  /* Ultra-clean Clean Zinc Dark Canvas (No cheap rainbow mesh) */
+  .bg-minimal-canvas {
+    background-color: #09090b;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), transparent 400px);
   }
 
-  /* Doppelrand / Double-Bezel Outer Shell */
-  .doppelrand-outer {
-    background: rgba(255, 255, 255, 0.03);
+  /* Minimalist Card Architecture - Single Crisp 1px Border */
+  .minimal-card {
+    background-color: #121215;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 6px;
-    border-radius: 1.75rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    border-radius: 12px;
+    transition: border-color 200ms var(--ease-clean), transform 200ms var(--ease-clean);
+  }
+  .minimal-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
   }
 
-  /* Doppelrand / Double-Bezel Inner Core */
-  .doppelrand-inner {
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: calc(1.75rem - 6px);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  /* High-Contrast Utilitarian Button */
+  .btn-minimal {
+    background-color: #f4f4f5;
+    color: #09090b;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background-color 160ms var(--ease-clean), transform 160ms var(--ease-clean);
+  }
+  .btn-minimal:hover {
+    background-color: #ffffff;
+  }
+  .btn-minimal:active {
+    transform: scale(0.97) !important;
   }
 
-  /* Taste Tactile Buttons */
-  .btn-taste {
-    transition: transform 180ms var(--ease-fluid), background-color 180ms var(--ease-fluid), border-color 180ms var(--ease-fluid), box-shadow 180ms var(--ease-fluid);
-    will-change: transform;
+  .btn-minimal-secondary {
+    background-color: #18181b;
+    color: #e4e4e7;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: background-color 160ms var(--ease-clean), border-color 160ms var(--ease-clean), transform 160ms var(--ease-clean);
   }
-  .btn-taste:hover {
-    transform: translateY(-1px);
+  .btn-minimal-secondary:hover {
+    background-color: #27272a;
+    border-color: rgba(255, 255, 255, 0.2);
   }
-  .btn-taste:active {
-    transform: scale(0.96) !important;
-  }
-
-  /* Button-in-Button Icon Circle motion */
-  .group:hover .btn-icon-circle {
-    transform: translateX(2px) scale(1.05);
-  }
-  .btn-icon-circle {
-    transition: transform 200ms var(--ease-fluid);
+  .btn-minimal-secondary:active {
+    transform: scale(0.97) !important;
   }
 
-  /* Taste Card Lift */
-  .card-taste {
-    transition: transform 240ms var(--ease-fluid), border-color 240ms var(--ease-fluid), box-shadow 240ms var(--ease-fluid);
-    will-change: transform;
-  }
-  .card-taste:hover {
-    transform: translateY(-4px);
-    border-color: rgba(99, 102, 241, 0.4) !important;
-    box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.25);
+  /* Entry animation */
+  .animate-minimal-fade {
+    animation: minimalFade 240ms var(--ease-clean) forwards;
   }
 
-  /* Scale Entry Animation */
-  .animate-taste-entry {
-    animation: tasteEntry 300ms var(--ease-fluid) forwards;
-  }
-
-  @keyframes tasteEntry {
+  @keyframes minimalFade {
     from {
       opacity: 0;
-      transform: scale(0.96) translateY(8px);
+      transform: translateY(6px);
     }
     to {
       opacity: 1;
-      transform: scale(1) translateY(0);
+      transform: translateY(0);
     }
   }
 }
