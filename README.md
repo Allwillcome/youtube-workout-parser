@@ -1,48 +1,75 @@
 # 🏋️ FitParser - YouTube Fitness Video → Executable Workout Plan
 
-FitParser 是一个将 **YouTube 健身/训练视频** 转换为 **结构化、可校对、可分享且带时间戳跳转训练计划** 的 AI 引擎。
-
-## 🌟 核心特性
-
-- 🎯 **超高颗粒度解析 (Ultra-High Granularity Extraction)**：涵盖视频中的全部 5+ 个动作序列、组数/次数/RPE 目标及肌群细分 Tag。
-- ⏱️ **秒数时间戳精准跳播 (Precision Timestamp Alignment)**：每个动作绑定原视频字幕秒数，点击直接跳转至具体讲授帧。
-- 💡 **运动力学姿势要点 (Biomechanical Form Cues)**：严谨提炼 3+ 条动作发力与姿势建议。
-- 🖤 **Monochrome Utilitarian 极简设计**：沉稳高感单色配色，首屏直达正题，支持一键导出刷卡卡片/Notion/JSON。
-- 🔗 **独立下钻路由 (`/workouts/[slug]`)**：基于磁盘持久化存储（`.data/workouts.json`），提供专属可分享 URL。
+[English](#english) | [简体中文](#简体中文)
 
 ---
 
-## 🚀 部署到 Vercel (Deployment Guide)
+<a name="english"></a>
+## 🌐 English
 
-### 1. 推送到 GitHub
-在 GitHub 上新建一个仓库（例如 `youtube-workout-parser`），然后执行以下指令：
+**FitParser** is an AI-powered engine that transforms **YouTube Fitness Videos** into **structured, verifiable, and executable workout plans** with precise timestamp video jumping.
 
-```bash
-git remote add origin https://github.com/<your-username>/youtube-workout-parser.git
-git branch -M main
-git push -u origin main
-```
+👉 **Live Demo**: [https://youtube-workout-parser.vercel.app](https://youtube-workout-parser.vercel.app)
 
-### 2. 在 Vercel 上一键部署
-1. 打开 [Vercel Dashboard](https://vercel.com/new)，选择 **Import** 刚刚推送的 GitHub 仓库；
-2. **Framework Preset** 选择 `Next.js`；
-3. **Environment Variables (环境变量配置)**（可选）：
-   - `OPENAI_API_KEY`: 您的 OpenAI API Key（用于启用大模型高颗粒度推理）
-   - `DEEPSEEK_API_KEY`: 您的 DeepSeek API Key
+### ✨ Core Features
 
-> 💡 **提示**：即便不设置全局环境变量，产品前端也已内置了 **【高级选项：API Key 自定义输入框】**。使用者可以在界面上自行填写自己的 OpenAI / DeepSeek Key 进行解析，不需要开发者承担 API Token 费用！
+- 🎯 **Ultra-High Granularity Extraction**: Complete exercise sequences (5+ movements), set types (Warmup/Feeder/Working/Failure), reps, RPE targets, and targeted muscle group tags.
+- ⏱️ **Precision Timestamp Alignment**: Bounded video timestamp evidence. Click to seek directly to the exact frame where the creator demonstrates form.
+- 💡 **Biomechanical Form Cues**: 3+ detailed technique and injury-prevention cues per exercise.
+- 🖤 **Monochrome Utilitarian Aesthetics**: Minimalist dark UI designed for focused review without rainbow mesh distraction.
+- 📋 **Multi-Format Export**: One-click export to printable gym check-in log sheets, formatted text (for Notion/Notes), or standard JSON.
+- 🔗 **Drill-down Routes (`/workouts/[slug]`)**: Unique shareable URL backed by dual-layer persistence (localStorage + disk cache).
 
----
-
-## 💻 本地开发
+### 🚀 Quick Start (Vercel & Local)
 
 ```bash
-# 1. 安装依赖
+# 1. Clone repository
+git clone https://github.com/Allwillcome/youtube-workout-parser.git
+cd youtube-workout-parser
+
+# 2. Install dependencies
 npm install
 
-# 2. 启动开发服务器
+# 3. Start local development
 npm run dev
+# Open http://localhost:3000
+```
 
-# 3. 访问本地页面
+---
+
+<a name="简体中文"></a>
+## 🌐 简体中文
+
+**FitParser** 是一款大模型与规则驱动的健身工具，能将 **YouTube 健身/训练视频** 转换为 **结构化、可校对、可导出且带秒数跳转的训练计划**。
+
+👉 **在线体验地址**: [https://youtube-workout-parser.vercel.app](https://youtube-workout-parser.vercel.app)
+
+### ✨ 核心特性
+
+- 🎯 **超高颗粒度解析**：完整提取视频中 5+ 个动作序列、组数类型（热身/递进/正式/力竭组）、次数、RPE 目标及肌群细分 Tag。
+- ⏱️ **秒数时间戳精准跳播**：动作点与字幕秒数 100% 对齐，点击即可直接跳转到对应画面复看发力。
+- 💡 **运动力学姿势要点**：每个动作精选 3+ 条发力与避坑指南。
+- 🖤 **Monochrome Utilitarian 极简设计**：沉稳单色高冷风，首屏直达正题，无无谓下滑。
+- 📋 **多端一键导出**：支持导出健身房打印刷卡卡片、复制排版文本（Notion/备忘录）及 Raw JSON。
+- 🔗 **专属下钻路由 (`/workouts/[slug]`)**：双重缓存保障，生成专属可分享 URL。
+
+### 🚀 本地运行与部署
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/Allwillcome/youtube-workout-parser.git
+cd youtube-workout-parser
+
+# 2. 安装依赖
+npm install
+
+# 3. 运行开发服务器
+npm run dev
 # 打开 http://localhost:3000
 ```
+
+---
+
+## 📄 License
+
+[MIT](LICENSE) © [FitParser](https://github.com/Allwillcome/youtube-workout-parser)
