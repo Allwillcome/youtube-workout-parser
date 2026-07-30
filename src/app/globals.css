@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  /* Emil Kowalski Custom Easing Curves & Timing Tokens */
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  /* Vanguard / Taste Agency Easing & Color Tokens */
+  --ease-fluid: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @layer utilities {
-  /* Hide dev overlay elements */
+  /* Suppress dev overlay */
   nextjs-portal,
   [class*="nextjs-toast"],
   [class*="nextjs-portal"],
@@ -19,46 +19,77 @@
     pointer-events: none !important;
   }
 
-  /* Emil Design Engineering Micro-interactions */
-  .btn-tactile {
-    transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+  /* Ethereal OLED Mesh Gradient Background */
+  .bg-ethereal-mesh {
+    background-color: #030712;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+  }
+
+  /* Doppelrand / Double-Bezel Outer Shell */
+  .doppelrand-outer {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px;
+    border-radius: 1.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+  }
+
+  /* Doppelrand / Double-Bezel Inner Core */
+  .doppelrand-inner {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: calc(1.75rem - 6px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  }
+
+  /* Taste Tactile Buttons */
+  .btn-taste {
+    transition: transform 180ms var(--ease-fluid), background-color 180ms var(--ease-fluid), border-color 180ms var(--ease-fluid), box-shadow 180ms var(--ease-fluid);
     will-change: transform;
   }
-  .btn-tactile:active {
+  .btn-taste:hover {
+    transform: translateY(-1px);
+  }
+  .btn-taste:active {
     transform: scale(0.96) !important;
   }
 
-  .card-hover-lift {
-    transition: transform 220ms var(--ease-out), border-color 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+  /* Button-in-Button Icon Circle motion */
+  .group:hover .btn-icon-circle {
+    transform: translateX(2px) scale(1.05);
+  }
+  .btn-icon-circle {
+    transition: transform 200ms var(--ease-fluid);
+  }
+
+  /* Taste Card Lift */
+  .card-taste {
+    transition: transform 240ms var(--ease-fluid), border-color 240ms var(--ease-fluid), box-shadow 240ms var(--ease-fluid);
     will-change: transform;
   }
-  .card-hover-lift:hover {
-    transform: translateY(-3px);
-  }
-  .card-hover-lift:active {
-    transform: translateY(-1px) scale(0.98);
-  }
-
-  /* Entry animation: Scale from 0.95 with opacity 0 (Never from scale(0)) */
-  .animate-scale-in {
-    animation: scaleIn 220ms var(--ease-out) forwards;
+  .card-taste:hover {
+    transform: translateY(-4px);
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.25);
   }
 
-  @keyframes scaleIn {
+  /* Scale Entry Animation */
+  .animate-taste-entry {
+    animation: tasteEntry 300ms var(--ease-fluid) forwards;
+  }
+
+  @keyframes tasteEntry {
     from {
       opacity: 0;
-      transform: scale(0.95);
+      transform: scale(0.96) translateY(8px);
     }
     to {
       opacity: 1;
-      transform: scale(1);
+      transform: scale(1) translateY(0);
     }
   }
-
-  /* Stagger animation utilities */
-  .stagger-cascade > *:nth-child(1) { animation-delay: 0ms; }
-  .stagger-cascade > *:nth-child(2) { animation-delay: 40ms; }
-  .stagger-cascade > *:nth-child(3) { animation-delay: 80ms; }
-  .stagger-cascade > *:nth-child(4) { animation-delay: 120ms; }
-  .stagger-cascade > *:nth-child(5) { animation-delay: 160ms; }
 }
