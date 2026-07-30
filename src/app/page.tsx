@@ -67,7 +67,6 @@ export default function HomePage() {
       await new Promise(r => setTimeout(r, 300));
 
       if (data.plan && data.plan.slug) {
-        // Automatically navigate to drill-down workout plan page
         router.push(`/workouts/${data.plan.slug}`);
       }
     } catch (err: any) {
@@ -238,7 +237,7 @@ export default function HomePage() {
                     className="w-full py-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium rounded-md btn-minimal-secondary flex items-center justify-center gap-2"
                   >
                     <Play className="w-3 h-3 text-zinc-400" />
-                    <span>{lang === 'zh' ? '解析该视频并下钻' : 'Parse & Open Drill-down'}</span>
+                    <span>{lang === 'zh' ? '解析视频' : 'Parse Video'}</span>
                   </button>
                 </div>
               ))}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export type Language = 'en' | 'zh';
 
@@ -13,109 +13,85 @@ interface I18nContextType {
 const translations: Record<Language, Record<string, string>> = {
   en: {
     appName: 'FitParser',
-    tagline: 'YouTube Workout Parser',
-    specDoc: 'PRD Spec',
-    heroBadge: 'YouTube Fitness Video → Structured Workout JSON',
-    heroTitle: 'Transform Workout Videos into',
-    heroTitleGradient: 'Structured Workout JSON',
-    heroDesc: 'Convert any YouTube fitness video into actionable, verifiable, and exportable workout plans with timestamped evidence.',
-    urlLabel: 'YouTube Video URL',
-    urlPlaceholder: 'Paste YouTube URL (e.g., https://www.youtube.com/watch?v=...)',
-    parseBtn: 'Parse Workout Plan',
-    parsingBtn: 'AI Extracting...',
-    presetTitle: 'Quick One-Click Demo Videos',
-    advancedOptions: 'Advanced Options (API Key or Custom Transcript)',
-    apiKeyLabel: 'OpenAI / Gemini API Key (Optional)',
-    customSubLabel: 'Paste Custom Subtitles (Fallback Route C)',
-    step1: 'Stage 1: Fetching YouTube metadata & captions...',
-    step2: 'Stage 1: Classifying video content (is_actionable)...',
-    step3: 'Stage 2: Extracting Exercises, Sets & Reps...',
-    step4: 'Stage 3: Running deterministic validation...',
-    verifySave: 'Verify & Generate Share Link',
-    saving: 'Verifying...',
-    exercisesHeader: 'Structured Exercises',
-    coachingCues: 'Coaching Form Cues',
-    addCue: 'Add Coaching Cue',
-    addExercise: 'Add Exercise',
-    addSet: 'Add Set',
+    tagline: 'YouTube Fitness Video → Grounded Workout Plan',
+    heroBadge: 'AI-Powered Biomechanical Extraction',
+    heroTitle: 'Transform YouTube Fitness Videos Into',
+    heroTitleGradient: 'Verifiable Workout Plans',
+    heroDesc: 'Extract strict, transcript-grounded exercises, sets, reps and form cues directly from top fitness creators.',
+    urlLabel: 'YouTube Video Link',
+    urlPlaceholder: 'https://www.youtube.com/watch?v=...',
+    parseBtn: 'Parse Video',
+    parsingBtn: 'Parsing Transcript...',
+    advancedOptions: 'Advanced API & Subtitle Options',
+    apiKeyLabel: 'OpenAI / DeepSeek API Key (Optional)',
+    customSubLabel: 'Custom Subtitle Transcript (Optional Override)',
+    step1: 'Step 1/4: Fetching YouTube metadata & captions...',
+    step2: 'Step 2/4: Auditing content actionability...',
+    step3: 'Step 3/4: Extracting structured workout schema...',
+    step4: 'Step 4/4: Validating exercise rules & timestamp evidence...',
+    exercisesHeader: 'Workout Routine & Coaching Cues',
+    addExercise: '+ Add Exercise',
     rest: 'Rest',
-    setsDetail: 'Sets Detail',
+    coachingCues: 'Biomechanical Form Cues',
+    addCue: '+ Add Form Cue',
+    setsDetail: 'Set Details',
+    addSet: '+ Add Set',
     evidenceTitle: 'Video Evidence Timestamp',
-    unresolvedTitle: 'Parser Warnings & Review Notes',
-    saveToHevy: 'Save to Hevy',
-    exportJson: 'Export JSON',
-    shareLink: 'Copy Share Link',
+    verifySave: 'Verify & Share Link',
+    saving: 'Verifying & Saving...',
+    verifiedBadge: 'Verified Workout Plan',
+    viewOriginal: 'View Original Video ↗',
+    shareLink: 'Share Plan URL',
     copiedLink: 'Link Copied!',
+    exportJson: 'Export Raw JSON',
     copiedJson: 'JSON Copied!',
-    verifiedBadge: 'Verified & Reviewed',
-    viewOriginal: 'Watch Original Video on YouTube',
-    langToggle: 'Language / 语言',
+    saveToHevy: 'Save to Hevy Routine'
   },
   zh: {
     appName: 'FitParser',
-    tagline: 'YouTube 健身视频解析器',
-    specDoc: 'PRD 方案',
-    heroBadge: 'YouTube 健身视频 → 可校对、可分享、可导出的结构化训练计划',
-    heroTitle: '将健身视频秒变',
-    heroTitleGradient: '结构化 Workout JSON',
-    heroDesc: '输入任意 YouTube 健身视频链接。自动解析动作、组数、次数、教练级动作姿势要点 (Coaching Cues) 及证据时间戳。',
-    urlLabel: 'YouTube 视频 URL 链接',
-    urlPlaceholder: '粘贴 YouTube 视频 URL (例如 https://www.youtube.com/watch?v=...)',
-    parseBtn: '解析训练计划',
-    parsingBtn: 'AI 解析中...',
-    presetTitle: '快速一键体验示例视频',
-    advancedOptions: '高级选项 (使用 API Key 或 自定义字幕)',
-    apiKeyLabel: 'OpenAI / Gemini API Key (可选)',
-    customSubLabel: '手动粘贴字幕 (路线 C 兜底)',
-    step1: '阶段 1: 读取 YouTube 视频元数据与字幕/转写...',
-    step2: '阶段 1: 进行视频类型判定 (is_actionable)...',
-    step3: '阶段 2: LLM 结构化提取 Exercises, Sets & Reps...',
-    step4: '阶段 3: 执行确定性程序校验与置信度推导...',
-    verifySave: '确认并生成分享链接',
-    saving: '校验保存中...',
-    exercisesHeader: '结构化动作表单',
-    coachingCues: '动作指导姿势要点 (Coaching Cues)',
-    addCue: '添加动作要点',
-    addExercise: '添加动作',
-    addSet: '增加一组',
+    tagline: 'YouTube 健身视频 → 可校对结构化训练计划',
+    heroBadge: '大模型驱动 · 生物力学动作提取引擎',
+    heroTitle: '把 YouTube 健身视频转换成',
+    heroTitleGradient: '可校对、可分享的训练计划',
+    heroDesc: '严谨提取顶级健身导师视频中的真实动作、组数次数与动作姿势要点，支持打卡刷卡导出。',
+    urlLabel: 'YouTube 视频链接',
+    urlPlaceholder: '输入 YouTube 视频链接 (如 https://www.youtube.com/watch?v=...)',
+    parseBtn: '解析视频',
+    parsingBtn: '正在提取视频字幕与结构...',
+    advancedOptions: '高级 API 与自定义字幕选项',
+    apiKeyLabel: 'OpenAI / DeepSeek API Key (可选)',
+    customSubLabel: '自定义粘贴视频字幕文本 (可选)',
+    step1: '步骤 1/4: 抓取 YouTube 元数据与字幕...',
+    step2: '步骤 2/4: 诊断视频可执行度...',
+    step3: '步骤 3/4: 提取结构化训练计划...',
+    step4: '步骤 4/4: 校验训练规则与时间戳证据...',
+    exercisesHeader: '动作训练计划与姿势要点',
+    addExercise: '+ 添加动作',
     rest: '休息',
-    setsDetail: '组别详情',
-    evidenceTitle: '视频证据时间戳',
-    unresolvedTitle: '解析不确定项与建议校对',
-    saveToHevy: '保存到 Hevy',
-    exportJson: '导出 JSON',
-    shareLink: '复制分享链接',
-    copiedLink: '已复制分享链接',
-    copiedJson: '已复制 Workout JSON',
-    verifiedBadge: '已校对保存',
-    viewOriginal: '观看 YouTube 原视频',
-    langToggle: '语言 / Language',
+    coachingCues: '运动力学与姿势要点',
+    addCue: '+ 添加要点',
+    setsDetail: '组数明细',
+    addSet: '+ 添加组',
+    evidenceTitle: '原视频证据秒数锚点',
+    verifySave: '确认并生成分享链接',
+    saving: '正在校验并生成...',
+    verifiedBadge: '已校验训练计划',
+    viewOriginal: '观看 YouTube 视频 ↗',
+    shareLink: '分享计划链接',
+    copiedLink: '链接已复制！',
+    exportJson: '导出 Raw JSON',
+    copiedJson: 'JSON 已复制！',
+    saveToHevy: '保存到 Hevy 训练库'
   }
 };
 
-const I18nContext = createContext<I18nContextType>({
-  lang: 'en',
-  setLang: () => {},
-  t: (key) => key,
-});
+const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Language>('en');
-
-  useEffect(() => {
-    const saved = localStorage.getItem('fitparser_lang') as Language;
-    if (saved === 'en' || saved === 'zh') {
-      setLangState(saved);
-    }
-  }, []);
-
-  const setLang = (newLang: Language) => {
-    setLangState(newLang);
-    localStorage.setItem('fitparser_lang', newLang);
-  };
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [lang, setLang] = useState<Language>('zh');
 
   const t = (key: string): string => {
-    return translations[lang]?.[key] || translations.en[key] || key;
+    return translations[lang]?.[key] || translations['en']?.[key] || key;
   };
 
   return (
@@ -126,18 +102,19 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useI18n() {
-  return useContext(I18nContext);
+  const context = useContext(I18nContext);
+  if (!context) {
+    throw new Error('useI18n must be used within an I18nProvider');
+  }
+  return context;
 }
 
-// Helper: Format bilingual exercise name based on current language
-export function formatExerciseName(name_en: string, name_zh: string, lang: Language): string {
+export function formatExerciseName(name_en: string, name_zh: string | undefined, lang: Language): string {
   if (lang === 'zh') {
-    // Bilingual presentation when in Chinese mode: English Name (中文译名)
     if (name_zh && name_zh !== name_en) {
       return `${name_en} (${name_zh})`;
     }
     return name_en;
   }
-  // Pure English when in English mode
   return name_en;
 }
