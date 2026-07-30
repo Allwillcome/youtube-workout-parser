@@ -12,7 +12,8 @@ import {
   ExternalLink,
   Sparkles,
   FileText,
-  X
+  X,
+  Link as LinkIcon
 } from 'lucide-react';
 import { useI18n, formatExerciseName } from '@/lib/i18n';
 
@@ -70,130 +71,131 @@ export function ExportHubModal({ plan, onClose }: ExportHubModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-      {/* Modal Container: Scale in from 0.95 (Never scale 0) */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 lg:p-8 max-w-2xl w-full space-y-6 shadow-2xl relative overflow-hidden animate-scale-in">
+    <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      {/* Modal Container: Clean Monochrome Zinc Design */}
+      <div className="minimal-card p-6 max-w-xl w-full space-y-5 animate-minimal-fade relative">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 btn-tactile"
+          className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-200 p-1.5 rounded hover:bg-zinc-800 transition-colors btn-minimal-secondary"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
         {/* Modal Header */}
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{lang === 'zh' ? '训练计划已校对并生效！' : 'Workout Plan Verified & Ready!'}</span>
+        <div className="space-y-1.5">
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
+            <Sparkles className="w-3 h-3 text-zinc-400" />
+            <span>{lang === 'zh' ? '计划已成功生成并校验' : 'Workout Plan Verified'}</span>
           </div>
-          <h2 className="text-2xl font-black text-white">
+          
+          <h2 className="text-base font-mono uppercase tracking-wider font-bold text-zinc-100">
             {lang === 'zh' ? '计划导出与分享中心' : 'Export & Share Hub'}
           </h2>
-          <p className="text-xs text-slate-400">
-            {lang === 'zh' ? '您可以复制专属分享链接、生成刷卡记组卡、导出到 Notion/备忘录或下载 JSON 数据。' : 'Copy unique share links, generate printable gym check-in sheets, or export to Notion/Hevy.'}
+          
+          <p className="text-xs text-zinc-400">
+            {lang === 'zh' ? '已生成专属链接。支持一键复制 URL、生成刷卡卡片或导出到 Notion / JSON。' : 'Copy unique share link, generate gym check-in sheets, or export to Notion.'}
           </p>
         </div>
 
-        {/* Main Export Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger-cascade">
-          
-          {/* Action 1: Share Link */}
-          <div className="bg-slate-950/80 border border-slate-800 hover:border-indigo-500/50 p-4 rounded-2xl space-y-3 card-hover-lift">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
-                  <Share2 className="w-4 h-4" />
-                </div>
-                <span className="text-sm font-bold text-white">{lang === 'zh' ? '专属公开/Unlisted 链接' : 'Unique Share URL'}</span>
-              </div>
-            </div>
-            <p className="text-xs text-slate-400">
-              {lang === 'zh' ? '带有完整视频跳播锚点与结构化表单的精美页面。' : 'Includes timestamp video jumps & clean workout cards.'}
-            </p>
+        {/* Share Link Preview Box */}
+        <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-md space-y-2">
+          <label className="text-[11px] font-mono text-zinc-400 uppercase font-semibold flex items-center gap-1.5">
+            <LinkIcon className="w-3 h-3 text-zinc-500" />
+            <span>{lang === 'zh' ? '专属分享 URL' : 'Shareable Plan Link'}</span>
+          </label>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={shareUrl}
+              className="flex-1 bg-zinc-900 border border-zinc-800 rounded px-3 py-1.5 text-xs text-zinc-300 font-mono focus:outline-none"
+            />
             <button
               onClick={copyLink}
-              className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl btn-tactile shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2"
+              className="px-4 py-1.5 btn-minimal text-xs shrink-0 flex items-center gap-1.5"
             >
-              {copiedLink ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
-              <span>{copiedLink ? (lang === 'zh' ? '已复制分享链接' : 'Link Copied!') : (lang === 'zh' ? '复制分享链接' : 'Copy Share Link')}</span>
+              {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedLink ? (lang === 'zh' ? '已复制' : 'Copied!') : (lang === 'zh' ? '复制链接' : 'Copy Link')}</span>
             </button>
           </div>
+        </div>
 
-          {/* Action 2: Printable Gym Check-in Sheet */}
-          <div className="bg-slate-950/80 border border-slate-800 hover:border-purple-500/50 p-4 rounded-2xl space-y-3 card-hover-lift">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center font-bold text-xs">
-                  <Printer className="w-4 h-4" />
-                </div>
-                <span className="text-sm font-bold text-white">{lang === 'zh' ? '健身房刷卡记组卡' : 'Gym Workout Log Sheet'}</span>
+        {/* Export Options Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          
+          {/* Action 1: Printable Gym Sheet */}
+          <div className="p-3.5 bg-zinc-950 border border-zinc-800 rounded-md space-y-2 flex flex-col justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <Printer className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="text-xs font-bold text-zinc-200">{lang === 'zh' ? '打印刷卡卡片' : 'Print Log Sheet'}</span>
               </div>
+              <p className="text-[11px] text-zinc-500">
+                {lang === 'zh' ? '带复选框的健身房卡片' : 'Printable paper sheet'}
+              </p>
             </div>
-            <p className="text-xs text-slate-400">
-              {lang === 'zh' ? '生成带打勾方框 [ ] 的纯净表格，供健身房打印使用。' : 'Printable PDF/Paper sheet with checkable set boxes.'}
-            </p>
+
             <button
               onClick={handlePrint}
-              className="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl btn-tactile shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2"
+              className="w-full py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium rounded btn-minimal-secondary flex items-center justify-center gap-1.5"
             >
-              <Printer className="w-4 h-4" />
-              <span>{lang === 'zh' ? '打印/导出刷卡卡片' : 'Print Gym Log Sheet'}</span>
+              <Printer className="w-3.5 h-3.5" />
+              <span>{lang === 'zh' ? '打印卡片' : 'Print'}</span>
             </button>
           </div>
 
-          {/* Action 3: Copy Text for Notion / Notes */}
-          <div className="bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 p-4 rounded-2xl space-y-3 card-hover-lift">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <span className="text-sm font-bold text-white">{lang === 'zh' ? '复制到 Notion / 备忘录' : 'Copy for Notion / Notes'}</span>
+          {/* Action 2: Copy for Notion */}
+          <div className="p-3.5 bg-zinc-950 border border-zinc-800 rounded-md space-y-2 flex flex-col justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="text-xs font-bold text-zinc-200">{lang === 'zh' ? '复制到 Notion' : 'Copy for Notion'}</span>
               </div>
+              <p className="text-[11px] text-zinc-500">
+                {lang === 'zh' ? '排版纯文本备忘录' : 'Formatted plain text'}
+              </p>
             </div>
-            <p className="text-xs text-slate-400">
-              {lang === 'zh' ? '生成包含双语动作名与要点的排版纯文本。' : 'Formatted plain text with exercise cues for personal notes.'}
-            </p>
+
             <button
               onClick={copyFormattedText}
-              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 text-xs font-bold rounded-xl btn-tactile flex items-center justify-center gap-2"
+              className="w-full py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium rounded btn-minimal-secondary flex items-center justify-center gap-1.5"
             >
-              {copiedText ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              <span>{copiedText ? (lang === 'zh' ? '已复制文本' : 'Text Copied!') : (lang === 'zh' ? '复制排版文本' : 'Copy Text')}</span>
+              {copiedText ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedText ? (lang === 'zh' ? '已复制' : 'Copied!') : (lang === 'zh' ? '复制文本' : 'Copy Text')}</span>
             </button>
           </div>
 
-          {/* Action 4: Download JSON */}
-          <div className="bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl space-y-3 card-hover-lift">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center font-bold text-xs">
-                  <Download className="w-4 h-4" />
-                </div>
-                <span className="text-sm font-bold text-white">{lang === 'zh' ? '导出原始 Workout JSON' : 'Export Raw JSON'}</span>
+          {/* Action 3: Export Raw JSON */}
+          <div className="p-3.5 bg-zinc-950 border border-zinc-800 rounded-md space-y-2 flex flex-col justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <Download className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="text-xs font-bold text-zinc-200">{lang === 'zh' ? '导出 JSON' : 'Export JSON'}</span>
               </div>
+              <p className="text-[11px] text-zinc-500">
+                {lang === 'zh' ? 'Raw Workout Schema' : 'Structured JSON data'}
+              </p>
             </div>
-            <p className="text-xs text-slate-400">
-              {lang === 'zh' ? '标准 JSON Schema，包含动作、时间戳与解析不确定项。' : 'Standard Workout JSON Schema with timestamps.'}
-            </p>
+
             <button
               onClick={copyJson}
-              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-bold rounded-xl btn-tactile flex items-center justify-center gap-2"
+              className="w-full py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium rounded btn-minimal-secondary flex items-center justify-center gap-1.5"
             >
-              {copiedJson ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              <span>{copiedJson ? (lang === 'zh' ? '已复制 JSON' : 'JSON Copied!') : (lang === 'zh' ? '复制 JSON' : 'Copy JSON')}</span>
+              {copiedJson ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedJson ? (lang === 'zh' ? '已复制' : 'Copied!') : (lang === 'zh' ? '复制 JSON' : 'Copy JSON')}</span>
             </button>
           </div>
 
         </div>
 
         {/* Modal Footer */}
-        <div className="flex justify-end pt-2">
+        <div className="flex justify-end pt-2 border-t border-zinc-800/80">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl btn-tactile"
+            className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium rounded btn-minimal-secondary"
           >
             {lang === 'zh' ? '关闭' : 'Close'}
           </button>
