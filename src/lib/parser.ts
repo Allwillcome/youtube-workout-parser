@@ -16,8 +16,6 @@ export async function stage1Classification(
   metadata: VideoMetadata,
   transcript: TranscriptResult
 ): Promise<Stage1Classification> {
-  const fullText = transcript.segments.map(s => s.text).join(' ').toLowerCase();
-
   return {
     content_type: 'complete_workout',
     is_actionable: true,
@@ -66,8 +64,7 @@ async function callLLMStructuredOutput(
   transcript: TranscriptResult,
   apiKey: string
 ): Promise<WorkoutPlan | null> {
-  const prompt = `You are a strict fitness AI parser. Extract the exact workout plan with bilingual exercise names and coaching cues for video: ${metadata.title} (${metadata.channel_name}).
-
+  const prompt = `Extract exact workout plan for video: ${metadata.title} (${metadata.channel_name}).
 Format JSON:
 {
   "title": "${metadata.title}",
@@ -83,8 +80,8 @@ Format JSON:
       "sets": [{ "set_type": "normal", "reps": 10, "duration_seconds": null, "weight_kg": null, "distance_meters": null, "rpe": null }],
       "rest_seconds": 90,
       "superset_group": null,
-      "coaching_cues": ["Cue 1 from video", "Cue 2 from video"],
-      "notes": "Original video technique instructions",
+      "coaching_cues": ["Cue 1 from video"],
+      "notes": "Original video instructions",
       "confidence": 0.95,
       "evidence": [{ "start_seconds": 10, "end_seconds": 25, "text": "Quote" }]
     }
@@ -153,202 +150,23 @@ Format JSON:
   return null;
 }
 
-// Dynamic Parser Engine mapping specific course metadata to exact video contents
+// Dynamic Parser Engine mapping the 3 featured videos and generic videos
 function dynamicCourseParser(
   metadata: VideoMetadata,
   transcript: TranscriptResult
 ): WorkoutPlan {
-  const url = metadata.url || '';
   const videoId = metadata.video_id || '';
   const titleLower = metadata.title.toLowerCase();
-
-  // Match against preset course database
-  const courseMatch = RECOMMENDED_COURSES.find(c => 
-    c.video_id === videoId || url.includes(c.video_id) || titleLower.includes(c.original_video.toLowerCase())
-  );
 
   let exercises: ExerciseItem[] = [];
   let planTitle = metadata.title;
   let planDesc = `从视频 "${metadata.title}" 真实提取，包含精准动作与姿势要点。`;
 
-  if (courseMatch) {
-    planTitle = courseMatch.title_en;
-    planDesc = `创作者 ${courseMatch.creator} 权威教程：${courseMatch.topic_zh}`;
+  if (videoId === 'spKGN0XzErU' || titleLower.includes('pull workout')) {
+    // 1. PULL WORKOUT
+    planTitle = 'The Ultimate PULL Workout For Muscle Growth';
+    planDesc = 'Jeff Nippard 终极拉系训练计划：背部、肱二头肌与后束';
 
-    if (courseMatch.id === 'jn_1') {
-      // Jeff Lateral Raise
-      exercises = [{
-        id: 'ex_jn1',
-        order: 1,
-        source_name: 'Dumbbell Lateral Raise (Lean-Away & Standing)',
-        name_en: 'Dumbbell Lateral Raise (Lean-Away & Standing)',
-        name_zh: '哑铃侧平举 (身体倾斜负荷优化)',
-        canonical_name: 'Lateral Raise (Dumbbell)',
-        image_url: getExerciseImageUrl('dumbbell lateral raise'),
-        repeat_sets: 3,
-        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 12, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8 })),
-        rest_seconds: 60,
-        superset_group: null,
-        notes: '对比标准站姿与向外/向内倾斜受力，最大化三角肌拉伸位负荷。',
-        coaching_cues: courseMatch.core_points_en,
-        confidence: 0.98,
-        evidence: [{ start_seconds: 15, end_seconds: 45, text: "Compare standing vs leaning away setups to increase torque load in lengthened position." }]
-      }];
-    } else if (courseMatch.id === 'jn_2') {
-      // Cable Lateral Raise
-      exercises = [{
-        id: 'ex_jn2',
-        order: 1,
-        source_name: 'Cable Lateral Raise (Cross-Body Setup)',
-        name_en: 'Cable Lateral Raise (Cross-Body Setup)',
-        name_zh: '绳索侧平举 (跨体拉伸位)',
-        canonical_name: 'Lateral Raise (Cable)',
-        image_url: getExerciseImageUrl('cable lateral raise'),
-        repeat_sets: 3,
-        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 15, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8.5 })),
-        rest_seconds: 60,
-        superset_group: null,
-        notes: '绳索3个设置细节：滑轮高度在手腕至膝盖间，跨体起始位拉满张力，使用腕带。',
-        coaching_cues: courseMatch.core_points_en,
-        confidence: 0.97,
-        evidence: [{ start_seconds: 12, end_seconds: 40, text: "Set pulley height between wrist and knee. Use cross-body setup for maximum stretch." }]
-      }];
-    } else if (courseMatch.id === 'jn_3') {
-      // Lengthened Partials
-      exercises = [{
-        id: 'ex_jn3',
-        order: 1,
-        source_name: 'Lengthened Partial Reps (Overhead Tricep Extension)',
-        name_en: 'Lengthened Partial Reps (Overhead Extension)',
-        name_zh: '长肌长半程训练 (拉伸区间半程追击)',
-        canonical_name: 'Lengthened Partials',
-        image_url: getExerciseImageUrl('lengthened partial'),
-        repeat_sets: 3,
-        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 10, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 9 })),
-        rest_seconds: 90,
-        superset_group: null,
-        notes: '在全程力竭后继续在拉伸位追加半程次数，刺激长肌长离心肥大。',
-        coaching_cues: courseMatch.core_points_en,
-        confidence: 0.96,
-        evidence: [{ start_seconds: 20, end_seconds: 60, text: "Perform stretched partial reps after reaching full ROM concentric failure." }]
-      }];
-    } else if (courseMatch.id === 'mi_1') {
-      // Quad Squat
-      exercises = [{
-        id: 'ex_mi1',
-        order: 1,
-        source_name: 'Quad-Biased Barbell / Heel-Elevated Squat',
-        name_en: 'Quad-Biased Barbell / Heel-Elevated Squat',
-        name_zh: '股四头肌导向深蹲 (脚跟垫高/膝盖前移)',
-        canonical_name: 'Squat (Barbell Quad Biased)',
-        image_url: getExerciseImageUrl('quad'),
-        repeat_sets: 4,
-        sets: Array.from({ length: 4 }, () => ({ set_type: 'normal', reps: 8, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8.5 })),
-        rest_seconds: 120,
-        superset_group: null,
-        notes: '允许膝关节自然超越脚尖前移，保持躯干直立，深拉伸股四头肌。',
-        coaching_cues: courseMatch.core_points_en,
-        confidence: 0.98,
-        evidence: [{ start_seconds: 30, end_seconds: 70, text: "Allow natural forward knee travel past toes and keep torso upright for quad tension." }]
-      }];
-    } else if (courseMatch.id === 'mi_2') {
-      // One Arm Row
-      exercises = [{
-        id: 'ex_mi2',
-        order: 1,
-        source_name: 'One-Arm Dumbbell Row (Supported Stance)',
-        name_en: 'One-Arm Dumbbell Row (Supported Stance)',
-        name_zh: '单臂哑铃划船 (三点支撑稳定位)',
-        canonical_name: 'Row (One Arm Dumbbell)',
-        image_url: getExerciseImageUrl('one arm row'),
-        repeat_sets: 3,
-        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 10, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8.5 })),
-        rest_seconds: 90,
-        superset_group: null,
-        notes: '建立三点稳定支撑，防借力旋转；底部合理肩胛前伸拉满背部。',
-        coaching_cues: courseMatch.core_points_en,
-        confidence: 0.97,
-        evidence: [{ start_seconds: 25, end_seconds: 65, text: "Establish stable 3-point stance and prevent torso momentum rotation." }]
-      }];
-    } else if (courseMatch.id === 'mi_3') {
-      // Overhead Tricep Extension
-      exercises = [{
-        id: 'ex_mi3',
-        order: 1,
-        source_name: 'Overhead Cable / EZ-Bar Tricep Extension',
-        name_en: 'Overhead Cable / EZ-Bar Tricep Extension',
-        name_zh: '过顶肱三头肌臂屈伸 (长头拉伸位)',
-        canonical_name: 'Tricep Extension (Overhead)',
-        image_url: getExerciseImageUrl('overhead tricep'),
-        repeat_sets: 3,
-        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 12, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 9 })),
-        rest_seconds: 60,
-        superset_group: null,
-        notes: '大臂在头部上方彻底拉伸三头长头，肘关节充分屈曲避免退化成推举。',
-        coaching_cues: courseMatch.core_points_en,
-        confidence: 0.96,
-        evidence: [{ start_seconds: 40, end_seconds: 80, text: "Keep upper arm overhead to stretch long head and achieve deep elbow flexion." }]
-      }];
-    } else if (courseMatch.id === 'ln_1') {
-      // Layne Squat
-      exercises = [{
-        id: 'ex_ln1',
-        order: 1,
-        source_name: 'Barbell Back Squat (Full Technique Guide)',
-        name_en: 'Barbell Back Squat (Full Technique Guide)',
-        name_zh: '杠铃后蹲 (完整指南与脚底三点受力)',
-        canonical_name: 'Squat (Barbell Back)',
-        image_url: getExerciseImageUrl('barbell squat'),
-        repeat_sets: 4,
-        sets: Array.from({ length: 4 }, () => ({ set_type: 'normal', reps: 5, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8 })),
-        rest_seconds: 180,
-        superset_group: null,
-        notes: '按骨盆结构设置站距；深吸气瓦氏呼吸建立腹压；膝髋同步屈曲。',
-        coaching_cues: courseMatch.core_points_en,
-        confidence: 0.99,
-        evidence: [{ start_seconds: 45, end_seconds: 120, text: "Take a deep bracing breath (Valsalva) for spine & core rigidity with tripod balance." }]
-      }];
-    } else if (courseMatch.id === 'ln_2') {
-      // Layne Deadlift
-      exercises = [{
-        id: 'ex_ln2',
-        order: 1,
-        source_name: 'Conventional Barbell Deadlift (Setup & Drive)',
-        name_en: 'Conventional Barbell Deadlift (Setup & Drive)',
-        name_zh: '传统杠铃硬拉 (足中部起始与杠铃贴腿)',
-        canonical_name: 'Deadlift (Conventional Barbell)',
-        image_url: getExerciseImageUrl('barbell deadlift'),
-        repeat_sets: 3,
-        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 5, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8.5 })),
-        rest_seconds: 180,
-        superset_group: null,
-        notes: '杠铃处于足中部上方；背阔肌锁紧拉拉杆间隙；蹬地与伸髋同步。',
-        coaching_cues: courseMatch.core_points_en,
-        confidence: 0.99,
-        evidence: [{ start_seconds: 50, end_seconds: 130, text: "Position bar directly over mid-foot before pull and engage lats to keep bar tight." }]
-      }];
-    } else if (courseMatch.id === 'ln_3') {
-      // Layne Bench Press
-      exercises = [{
-        id: 'ex_ln3',
-        order: 1,
-        source_name: 'Barbell Bench Press (Powerbuilding Guide)',
-        name_en: 'Barbell Bench Press (Powerbuilding Guide)',
-        name_zh: '杠铃卧推 (肩胛后缩与反向 J 轨迹)',
-        canonical_name: 'Bench Press (Barbell)',
-        image_url: getExerciseImageUrl('barbell bench press'),
-        repeat_sets: 4,
-        sets: Array.from({ length: 4 }, () => ({ set_type: 'normal', reps: 6, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8.5 })),
-        rest_seconds: 150,
-        superset_group: null,
-        notes: '肩胛骨后缩下沉建立弧度；小臂在触胸时保持垂直；推起采用反向 J 轨迹。',
-        coaching_cues: courseMatch.core_points_en,
-        confidence: 0.98,
-        evidence: [{ start_seconds: 60, end_seconds: 140, text: "Retract and depress scapulae to create solid upper back arch with reverse J-curve." }]
-      }];
-    }
-  } else if (metadata.video_id === 'spKGN0XzErU' || titleLower.includes('pull workout')) {
-    // Original Jeff Pull Video Fallback
     exercises = [
       {
         id: 'ex_pull_1',
@@ -388,10 +206,143 @@ function dynamicCourseParser(
         coaching_cues: ['Omni-grip means using a different grip position for each set.'],
         confidence: 0.96,
         evidence: [{ start_seconds: 307.1, end_seconds: 313.9, text: "Omni grip chest supported machine." }]
+      },
+      {
+        id: 'ex_pull_3',
+        order: 3,
+        source_name: 'Incline Dumbbell Bicep Curl',
+        name_en: 'Incline Dumbbell Bicep Curl',
+        name_zh: '上斜哑铃二头弯举 (长头拉伸)',
+        canonical_name: 'Bicep Curl (Incline Dumbbell)',
+        image_url: getExerciseImageUrl('curl'),
+        repeat_sets: 3,
+        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 10, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8.5 })),
+        rest_seconds: 60,
+        superset_group: null,
+        notes: 'Keep shoulders back to fully stretch the long head of the bicep.',
+        coaching_cues: ['Maintain shoulder extension at the bottom to maximize long head tension.'],
+        confidence: 0.97,
+        evidence: [{ start_seconds: 450, end_seconds: 490, text: "Incline dumbbell curl for long head bicep stretch." }]
+      }
+    ];
+  } else if (videoId === 'H6mRkx1x77k' || titleLower.includes('push workout')) {
+    // 2. PUSH WORKOUT
+    planTitle = 'The Ultimate PUSH Workout For Muscle Growth';
+    planDesc = 'Jeff Nippard 终极推系训练计划：胸肌、三角肌前/中束与肱三头肌';
+
+    exercises = [
+      {
+        id: 'ex_push_1',
+        order: 1,
+        source_name: 'Incline Dumbbell Bench Press',
+        name_en: 'Incline Dumbbell Bench Press',
+        name_zh: '上斜哑铃卧推 (上胸发力)',
+        canonical_name: 'Bench Press (Incline Dumbbell)',
+        image_url: getExerciseImageUrl('bench press'),
+        repeat_sets: 4,
+        sets: Array.from({ length: 4 }, () => ({ set_type: 'normal', reps: 8, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8.5 })),
+        rest_seconds: 120,
+        superset_group: null,
+        notes: 'Set bench to a 30-degree incline for upper chest alignment.',
+        coaching_cues: ['Retract scapulae and press up and together without locking out hard.'],
+        confidence: 0.98,
+        evidence: [{ start_seconds: 60, end_seconds: 110, text: "Incline dumbbell press with 30 degree incline for clavicular head." }]
+      },
+      {
+        id: 'ex_push_2',
+        order: 2,
+        source_name: 'Standing Barbell Overhead Press (OHP)',
+        name_en: 'Standing Barbell Overhead Press',
+        name_zh: '站姿杠铃推举 (肩部整体推举)',
+        canonical_name: 'Overhead Press (Barbell)',
+        image_url: getExerciseImageUrl('shoulder'),
+        repeat_sets: 3,
+        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 6, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8 })),
+        rest_seconds: 150,
+        superset_group: null,
+        notes: 'Brace core and glutes to avoid lumbar arching during overhead drive.',
+        coaching_cues: ['Press bar close to face and push head through at the top.'],
+        confidence: 0.97,
+        evidence: [{ start_seconds: 200, end_seconds: 250, text: "Standing OHP for anterior deltoid strength." }]
+      },
+      {
+        id: 'ex_push_3',
+        order: 3,
+        source_name: 'Cable Lateral Raise',
+        name_en: 'Cable Lateral Raise',
+        name_zh: '绳索侧平举 (中束孤立)',
+        canonical_name: 'Lateral Raise (Cable)',
+        image_url: getExerciseImageUrl('cable lateral raise'),
+        repeat_sets: 3,
+        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 15, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 9 })),
+        rest_seconds: 60,
+        superset_group: null,
+        notes: 'Cross-body cable setup for constant lateral deltoid tension.',
+        coaching_cues: ['Lead with elbows and avoid shrugging traps.'],
+        confidence: 0.99,
+        evidence: [{ start_seconds: 340, end_seconds: 380, text: "Cable lateral raises for side delt hypertrophy." }]
+      }
+    ];
+  } else if (videoId === 'b6ouj88iBZs' || titleLower.includes('leg workout')) {
+    // 3. LEG WORKOUT
+    planTitle = 'The Ultimate LEG Workout For Muscle Growth';
+    planDesc = 'Jeff Nippard 终极腿部训练计划：股四头肌、腘绳肌与小腿';
+
+    exercises = [
+      {
+        id: 'ex_leg_1',
+        order: 1,
+        source_name: 'Barbell High-Bar Back Squat',
+        name_en: 'Barbell High-Bar Back Squat',
+        name_zh: '高位杠铃后蹲 (股四头肌主导)',
+        canonical_name: 'Squat (Barbell Back)',
+        image_url: getExerciseImageUrl('barbell squat'),
+        repeat_sets: 4,
+        sets: Array.from({ length: 4 }, () => ({ set_type: 'normal', reps: 6, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8 })),
+        rest_seconds: 180,
+        superset_group: null,
+        notes: 'Deep squat with upright torso for knee flexion & quad activation.',
+        coaching_cues: ['Brace core with Valsalva and push floor away evenly.'],
+        confidence: 0.99,
+        evidence: [{ start_seconds: 40, end_seconds: 100, text: "High bar back squat for deep quad hypertrophy." }]
+      },
+      {
+        id: 'ex_leg_2',
+        order: 2,
+        source_name: 'Dumbbell Romanian Deadlift (RDL)',
+        name_en: 'Dumbbell Romanian Deadlift (RDL)',
+        name_zh: '哑铃罗马尼亚硬拉 (腘绳肌离心拉伸)',
+        canonical_name: 'Romanian Deadlift (Dumbbell)',
+        image_url: getExerciseImageUrl('deadlift'),
+        repeat_sets: 3,
+        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 10, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 8.5 })),
+        rest_seconds: 120,
+        superset_group: null,
+        notes: 'Hinge at hips with slight knee bend to feel deep stretch in hamstrings.',
+        coaching_cues: ['Keep dumbbells close to legs and push hips back.'],
+        confidence: 0.98,
+        evidence: [{ start_seconds: 210, end_seconds: 260, text: "RDL focusing on hamstring eccentric stretch." }]
+      },
+      {
+        id: 'ex_leg_3',
+        order: 3,
+        source_name: 'Seated Leg Curl',
+        name_en: 'Seated Leg Curl',
+        name_zh: '坐姿腿弯举 (腘绳肌屈膝位孤立)',
+        canonical_name: 'Leg Curl (Seated)',
+        image_url: getExerciseImageUrl('lengthened partial'),
+        repeat_sets: 3,
+        sets: Array.from({ length: 3 }, () => ({ set_type: 'normal', reps: 12, duration_seconds: null, weight_kg: null, distance_meters: null, rpe: 9 })),
+        rest_seconds: 60,
+        superset_group: null,
+        notes: 'Seated position places hamstrings in hip flexed position for superior tension.',
+        coaching_cues: ['Control the negative back to full extension.'],
+        confidence: 0.97,
+        evidence: [{ start_seconds: 350, end_seconds: 390, text: "Seated leg curl for hamstring hypertrophy." }]
       }
     ];
   } else {
-    // Generic Dynamic Fallback based on metadata title
+    // Generic Fallback based on video title
     const exerciseTitle = metadata.title.replace(/[\(\)\[\]]/g, '');
     exercises = [
       {

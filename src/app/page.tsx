@@ -4,19 +4,14 @@ import React, { useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { WorkoutEditor } from '@/components/WorkoutEditor';
 import { WorkoutPlan } from '@/types/workout';
-import { RECOMMENDED_COURSES, RecommendedCourse } from '@/lib/presetData';
+import { RECOMMENDED_COURSES } from '@/lib/presetData';
 import { 
   Video, 
   ArrowRight, 
   Dumbbell, 
-  Layers, 
-  ShieldCheck, 
-  CheckCircle2, 
   AlertCircle,
   Key,
-  FileText,
   Play,
-  User,
   Clock,
   BookOpen
 } from 'lucide-react';
@@ -28,17 +23,12 @@ export default function HomePage() {
   const [apiKey, setApiKey] = useState('');
   const [customSubtitle, setCustomSubtitle] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [selectedCreator, setSelectedCreator] = useState<string>('all');
   
   const [isParsing, setIsParsing] = useState(false);
   const [parseStep, setParseStep] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   
   const [currentPlan, setCurrentPlan] = useState<WorkoutPlan | null>(null);
-
-  const filteredCourses = selectedCreator === 'all' 
-    ? RECOMMENDED_COURSES 
-    : RECOMMENDED_COURSES.filter(c => c.creator.includes(selectedCreator));
 
   const handleParse = async (targetUrl?: string) => {
     const inputUrl = targetUrl || url;
@@ -95,7 +85,7 @@ export default function HomePage() {
 
       <main className="flex-1 flex flex-col items-center">
         {!currentPlan ? (
-          <div className="w-full max-w-5xl px-4 lg:px-8 py-12 lg:py-16 space-y-12 animate-minimal-fade">
+          <div className="w-full max-w-4xl px-4 lg:px-8 py-12 lg:py-16 space-y-12 animate-minimal-fade">
             
             {/* Hero Section */}
             <div className="text-center space-y-4 max-w-2xl mx-auto">
@@ -209,56 +199,24 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Recommended Master Courses Section */}
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-lg font-bold text-zinc-100 flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-zinc-400" />
-                    <span>{lang === 'zh' ? '顶流导师经典健身教程库' : 'Master Exercise Tutorials Library'}</span>
-                  </h2>
-                  <p className="text-xs text-zinc-400">
-                    {lang === 'zh' ? '精选 Jeff Nippard、Mike Israetel (RP)、Layne Norton 权威动作指南' : 'Curated technical guides by Jeff Nippard, Dr. Mike Israetel (RP) & Layne Norton'}
-                  </p>
-                </div>
-
-                {/* Creator Filter Tabs */}
-                <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded-md border border-zinc-800 text-xs self-start sm:self-auto font-mono">
-                  <button
-                    onClick={() => setSelectedCreator('all')}
-                    className={`px-3 py-1 rounded font-medium transition-all ${selectedCreator === 'all' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
-                  >
-                    {lang === 'zh' ? '全部 (9)' : 'All (9)'}
-                  </button>
-                  <button
-                    onClick={() => setSelectedCreator('Jeff')}
-                    className={`px-3 py-1 rounded font-medium transition-all ${selectedCreator === 'Jeff' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
-                  >
-                    Jeff Nippard
-                  </button>
-                  <button
-                    onClick={() => setSelectedCreator('Mike')}
-                    className={`px-3 py-1 rounded font-medium transition-all ${selectedCreator === 'Mike' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
-                  >
-                    Mike Israetel
-                  </button>
-                  <button
-                    onClick={() => setSelectedCreator('Layne')}
-                    className={`px-3 py-1 rounded font-medium transition-all ${selectedCreator === 'Layne' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
-                  >
-                    Layne Norton
-                  </button>
-                </div>
+            {/* Featured Recommended Videos Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-mono uppercase tracking-wider font-bold text-zinc-300 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-zinc-400" />
+                  <span>{lang === 'zh' ? '精选推荐视频教程' : 'Featured Video Tutorials'}</span>
+                </h2>
+                <span className="text-[11px] text-zinc-500 font-mono">3 Featured Routines</span>
               </div>
 
-              {/* Course Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {filteredCourses.map((course) => (
+              {/* Clean Video Cards List (Showing Only Creator & Video Title) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {RECOMMENDED_COURSES.map((course) => (
                   <div
                     key={course.id}
-                    className="minimal-card p-5 space-y-4 flex flex-col justify-between group"
+                    className="minimal-card p-5 space-y-3 flex flex-col justify-between group"
                   >
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider font-semibold bg-zinc-800 text-zinc-300 border border-zinc-700/60 rounded">
                           {course.creator}
@@ -269,27 +227,9 @@ export default function HomePage() {
                         </span>
                       </div>
 
-                      <h3 className="text-sm font-bold text-zinc-100 group-hover:text-white transition-colors line-clamp-2">
+                      <h3 className="text-xs font-bold text-zinc-100 group-hover:text-white transition-colors line-clamp-2 leading-relaxed">
                         {lang === 'zh' ? course.title_zh : course.title_en}
                       </h3>
-
-                      <p className="text-xs text-zinc-400 bg-zinc-950 p-2 rounded border border-zinc-800/80">
-                        <strong className="text-zinc-300">{lang === 'zh' ? '课程方向:' : 'Topic:'}</strong> {lang === 'zh' ? course.topic_zh : course.topic_en}
-                      </p>
-
-                      <div className="space-y-1.5 pt-1">
-                        <span className="text-[11px] font-semibold text-zinc-300">
-                          {lang === 'zh' ? '核心要点:' : 'Core Technique:'}
-                        </span>
-                        <ul className="space-y-1">
-                          {(lang === 'zh' ? course.core_points_zh : course.core_points_en).map((pt, idx) => (
-                            <li key={idx} className="text-[11px] text-zinc-400 flex items-start gap-1.5">
-                              <span className="w-1 h-1 rounded-full bg-zinc-500 mt-1.5 shrink-0" />
-                              <span className="line-clamp-2">{pt}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
                     </div>
 
                     <button
@@ -297,40 +237,31 @@ export default function HomePage() {
                         setUrl(course.url);
                         handleParse(course.url);
                       }}
-                      className="w-full mt-4 py-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium rounded-md btn-minimal-secondary flex items-center justify-center gap-2"
+                      className="w-full py-2 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium rounded-md btn-minimal-secondary flex items-center justify-center gap-2"
                     >
                       <Play className="w-3 h-3 text-zinc-400" />
-                      <span>{lang === 'zh' ? '解析该教程训练计划' : 'Parse This Tutorial'}</span>
+                      <span>{lang === 'zh' ? '一键解析此视频' : 'Parse Video'}</span>
                     </button>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Feature Architecture Highlights */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-8 border-t border-zinc-800">
-              <div className="minimal-card p-4 space-y-2">
-                <div className="w-6 h-6 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 font-mono font-bold text-xs">
-                  01
-                </div>
-                <h4 className="text-xs font-bold text-zinc-200">Two-Stage LLM Extraction</h4>
-                <p className="text-[11px] text-zinc-400">Classifies content first (is_actionable), then extracts exercises, sets, reps & timestamped cues.</p>
+            {/* Architecture Footer Highlights */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-zinc-800/80">
+              <div className="p-3.5 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1">
+                <div className="text-[11px] font-mono font-bold text-zinc-300">01. Two-Stage LLM</div>
+                <p className="text-[11px] text-zinc-500">Actionable classification & exercise extraction.</p>
               </div>
 
-              <div className="minimal-card p-4 space-y-2">
-                <div className="w-6 h-6 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 font-mono font-bold text-xs">
-                  02
-                </div>
-                <h4 className="text-xs font-bold text-zinc-200">Deterministic Validation</h4>
-                <p className="text-[11px] text-zinc-400">Prevents AI hallucinations by auditing non-negatives, set rules, superset logic and unresolved items.</p>
+              <div className="p-3.5 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1">
+                <div className="text-[11px] font-mono font-bold text-zinc-300">02. Deterministic Audit</div>
+                <p className="text-[11px] text-zinc-500">Validates non-negatives, sets & superset rules.</p>
               </div>
 
-              <div className="minimal-card p-4 space-y-2">
-                <div className="w-6 h-6 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 font-mono font-bold text-xs">
-                  03
-                </div>
-                <h4 className="text-xs font-bold text-zinc-200">Bilingual & Image Visuals</h4>
-                <p className="text-[11px] text-zinc-400">Default English with bilingual Chinese support. Dynamic exercise thumbnails for ultimate visual clarity.</p>
+              <div className="p-3.5 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1">
+                <div className="text-[11px] font-mono font-bold text-zinc-300">03. Bilingual Cues</div>
+                <p className="text-[11px] text-zinc-500">English default with bilingual Chinese names.</p>
               </div>
             </div>
 
