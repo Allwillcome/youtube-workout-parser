@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# local persistent storage
+/.data/
+
 # next.js
 /.next/
 /out/
