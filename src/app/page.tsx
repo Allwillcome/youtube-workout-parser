@@ -67,6 +67,17 @@ export default function HomePage() {
       await new Promise(r => setTimeout(r, 300));
 
       if (data.plan && data.plan.slug) {
+        // Save plan into browser localStorage so drill-down hydration succeeds 100%
+        try {
+          const stored = localStorage.getItem('yt_workout_plans') || '{}';
+          const map = JSON.parse(stored);
+          map[data.plan.slug] = data.plan;
+          map[data.plan.id] = data.plan;
+          localStorage.setItem('yt_workout_plans', JSON.stringify(map));
+        } catch (e) {
+          console.warn('Failed to save to localStorage:', e);
+        }
+
         router.push(`/workouts/${data.plan.slug}`);
       }
     } catch (err: any) {
