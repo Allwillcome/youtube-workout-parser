@@ -8,10 +8,6 @@ export function extractVideoId(url: string): string | null {
   return (match && match[2].length === 11) ? match[2] : null;
 }
 
-export function extractYouTubeId(url: string): string | null {
-  return extractVideoId(url);
-}
-
 // Fetch YouTube Metadata via oEmbed API (No API Key Required)
 export async function fetchVideoMetadata(url: string): Promise<VideoMetadata> {
   const videoId = extractVideoId(url);
@@ -98,8 +94,4 @@ export async function fetchTranscript(videoId: string, customText?: string): Pro
       { start_seconds: 40, end_seconds: 80, text: "Make sure to maintain controlled eccentric movement and execute full range of motion." }
     ]
   };
-}
-
-export async function fetchVideoTranscript(videoId: string, customText?: string): Promise<TranscriptResult> {
-  return fetchTranscript(videoId, customText);
 }

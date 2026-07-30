@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchVideoMetadata, fetchVideoTranscript, extractYouTubeId } from '@/lib/youtube';
+import { fetchVideoMetadata, fetchTranscript, extractVideoId } from '@/lib/youtube';
 import { stage1Classification, stage2ExtractWorkout } from '@/lib/parser';
 import { saveWorkoutPlan } from '@/lib/storage';
 
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '请提供有效的 YouTube 视频链接' }, { status: 400 });
     }
 
-    const videoId = extractYouTubeId(url);
+    const videoId = extractVideoId(url);
     if (!videoId) {
       return NextResponse.json({ error: '无法解析 YouTube 视频 ID，请检查链接格式' }, { status: 400 });
     }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         }]
       };
     } else {
-      transcriptResult = await fetchVideoTranscript(videoId);
+      transcriptResult = await fetchTranscript(videoId);
     }
 
     // 3. Stage 1: Classification
