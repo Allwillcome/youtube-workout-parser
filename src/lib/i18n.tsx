@@ -13,10 +13,10 @@ interface I18nContextType {
 const translations: Record<Language, Record<string, string>> = {
   en: {
     appName: 'FitParser',
-    tagline: 'YouTube Fitness Video → Grounded Workout Plan',
+    tagline: 'YouTube Fitness Video → Executable Workout Plan',
     heroBadge: 'AI-Powered Biomechanical Extraction',
     heroTitle: 'Transform YouTube Fitness Videos Into',
-    heroTitleGradient: 'Verifiable Workout Plans',
+    heroTitleGradient: 'Executable Workout Plans',
     heroDesc: 'Extract strict, transcript-grounded exercises, sets, reps and form cues directly from top fitness creators.',
     urlLabel: 'YouTube Video Link',
     urlPlaceholder: 'https://www.youtube.com/watch?v=...',
@@ -49,10 +49,10 @@ const translations: Record<Language, Record<string, string>> = {
   },
   zh: {
     appName: 'FitParser',
-    tagline: 'YouTube 健身视频 → 可校对结构化训练计划',
+    tagline: 'YouTube 健身视频 → 可执行训练计划',
     heroBadge: '大模型驱动 · 生物力学动作提取引擎',
     heroTitle: '把 YouTube 健身视频转换成',
-    heroTitleGradient: '可校对、可分享的训练计划',
+    heroTitleGradient: '可执行的训练计划',
     heroDesc: '严谨提取顶级健身导师视频中的真实动作、组数次数与动作姿势要点，支持打卡刷卡导出。',
     urlLabel: 'YouTube 视频链接',
     urlPlaceholder: '输入 YouTube 视频链接 (如 https://www.youtube.com/watch?v=...)',
