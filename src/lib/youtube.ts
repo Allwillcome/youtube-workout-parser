@@ -8,7 +8,9 @@ export function extractVideoId(url: string): string | null {
   return (match && match[2].length === 11) ? match[2] : null;
 }
 
-export const extractYouTubeId = extractVideoId;
+export function extractYouTubeId(url: string): string | null {
+  return extractVideoId(url);
+}
 
 // Fetch YouTube Metadata via oEmbed API (No API Key Required)
 export async function fetchVideoMetadata(url: string): Promise<VideoMetadata> {
@@ -98,4 +100,6 @@ export async function fetchTranscript(videoId: string, customText?: string): Pro
   };
 }
 
-export const fetchVideoTranscript = fetchTranscript;
+export async function fetchVideoTranscript(videoId: string, customText?: string): Promise<TranscriptResult> {
+  return fetchTranscript(videoId, customText);
+}
