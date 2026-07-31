@@ -33,6 +33,7 @@ import { useRouter } from 'next/navigation';
 import { useI18n, formatExerciseName } from '@/lib/i18n';
 import { getExerciseImageUrl } from '@/lib/exerciseImages';
 import { ExportHubModal } from '@/components/ExportHubModal';
+import { detectPlatform, getPlatformEmbedUrl, getPlatformViewLabel } from '@/lib/videoPlatforms';
 
 interface WorkoutEditorProps {
   initialPlan: WorkoutPlan;
@@ -51,7 +52,6 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
   const router = useRouter();
 
   useEffect(() => {
-    // Automatically reset scroll position to top when entering drill-down page
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
@@ -183,11 +183,13 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
     }
   };
 
-  const videoEmbedUrl = `https://www.youtube.com/embed/${plan.source.video_id}?enablejsapi=1&autoplay=0`;
+  const platform = detectPlatform(plan.source.url || '');
+  const videoEmbedUrl = getPlatformEmbedUrl(plan.source.video_id, platform, plan.source.url);
+  const viewOriginalLabel = getPlatformViewLabel(platform, plan.source.url);
 
   return (
     <div className="w-full max-w-[1500px] mx-auto px-4 py-2 space-y-3 animate-minimal-fade">
-      {/* Top Compact Bar: Immediate access to Home & Export */}
+      {/* Top Compact Bar */}
       <div className="minimal-card p-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <Link 
@@ -249,7 +251,7 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
       {/* Main Grid: Zero-scrolling Needed Above-the-Fold Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         
-        {/* LEFT COLUMN: Ultra Compact Player */}
+        {/* LEFT COLUMN: Multi-Platform Video Player (Bilibili / Douyin / YouTube) */}
         <div className="lg:col-span-5 space-y-3 lg:sticky lg:top-16">
           <div className="minimal-card overflow-hidden">
             <div className="relative aspect-video bg-zinc-950">
@@ -269,12 +271,19 @@ export function WorkoutEditor({ initialPlan, isReadOnly = false }: WorkoutEditor
                   href={plan.source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-zinc-300 hover:text-white flex items-center gap-1 transition-colors truncate max-w-[200px]"
+                  className="font-medium text-zinc-300 hover:text-white flex items-center gap-1 transition-colors truncate max-w-[220px]"
                 >
                   <span>{plan.source.channel_name}</span>
                   <ExternalLink className="w-3 h-3 text-zinc-500 shrink-0" />
                 </a>
-                <span className="text-zinc-500 font-mono text-[10px]">{t('viewOriginal')}</span>
+                <a 
+                  href={plan.source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-400 hover:text-white font-mono text-[10px] flex items-center gap-1"
+                >
+                  <span>{viewOriginalLabel}</span>
+                </a>
               </div>
             </div>
           </div>

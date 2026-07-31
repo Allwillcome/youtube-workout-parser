@@ -18,6 +18,7 @@ import {
 import Link from 'next/link';
 import { useI18n, formatExerciseName } from '@/lib/i18n';
 import { getExerciseImageUrl } from '@/lib/exerciseImages';
+import { detectPlatform, getPlatformEmbedUrl, getPlatformViewLabel } from '@/lib/videoPlatforms';
 
 interface ShareViewProps {
   plan: WorkoutPlan;
@@ -52,6 +53,9 @@ export function ShareView({ plan }: ShareViewProps) {
     setHevyStatus(lang === 'zh' ? '已成功与 Hevy 模板匹配！Routine 已创建。' : 'Successfully mapped to Hevy exercise templates! Routine created.');
   };
 
+  const platform = detectPlatform(plan.source.url || '');
+  const viewOriginalLabel = getPlatformViewLabel(platform, plan.source.url);
+
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-4 space-y-6 animate-minimal-fade">
       {/* Compact Top Navigation Bar */}
@@ -64,7 +68,7 @@ export function ShareView({ plan }: ShareViewProps) {
           <span>{lang === 'zh' ? '返回首页' : 'Back Home'}</span>
         </Link>
 
-        {/* Action Buttons Right on Top so no long scrolling needed */}
+        {/* Action Buttons Right on Top */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => copyToClipboard(shareUrl, 'link')}
@@ -92,7 +96,7 @@ export function ShareView({ plan }: ShareViewProps) {
         </div>
       </div>
 
-      {/* Share Plan Compact Header Card (Minimalist Zinc Theme) */}
+      {/* Share Plan Header Card */}
       <div className="minimal-card p-5 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5">
@@ -136,13 +140,13 @@ export function ShareView({ plan }: ShareViewProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-[11px] text-zinc-400 hover:text-white font-medium shrink-0 ml-2"
           >
-            <span>{t('viewOriginal')}</span>
+            <span>{viewOriginalLabel}</span>
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
       </div>
 
-      {/* Exercises Grid List - Fully Aligned Minimalist Monochrome Style */}
+      {/* Exercises Grid List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between pb-1 border-b border-zinc-800">
           <h2 className="text-sm font-bold text-zinc-200 flex items-center gap-2 font-mono uppercase tracking-wider">
@@ -207,7 +211,7 @@ export function ShareView({ plan }: ShareViewProps) {
         </div>
       </div>
 
-      {/* Hevy Modal - Minimalist Monochrome Style */}
+      {/* Hevy Modal */}
       {showHevyModal && (
         <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="minimal-card p-6 max-w-md w-full space-y-4 animate-minimal-fade">
