@@ -12,7 +12,8 @@ import {
   Key,
   Play,
   Clock,
-  BookOpen
+  BookOpen,
+  Sparkles
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
@@ -30,8 +31,8 @@ export default function HomePage() {
 
   const handleParse = async (targetUrl?: string) => {
     const inputUrl = targetUrl || url;
-    if (!inputUrl || (!inputUrl.includes('youtube.com') && !inputUrl.includes('youtu.be'))) {
-      setErrorMsg(lang === 'zh' ? '请输入正确的 YouTube 视频链接 (例如 https://www.youtube.com/watch?v=...)' : 'Please enter a valid YouTube URL');
+    if (!inputUrl || inputUrl.trim() === '') {
+      setErrorMsg(lang === 'zh' ? '请输入正确的视频链接 (支持 YouTube / B站 / 抖音)' : 'Please enter a valid video URL (YouTube / Bilibili / Douyin)');
       return;
     }
 
@@ -67,7 +68,7 @@ export default function HomePage() {
       await new Promise(r => setTimeout(r, 300));
 
       if (data.plan && data.plan.slug) {
-        // Save plan into browser localStorage so drill-down hydration succeeds 100%
+        // Save plan into browser localStorage
         try {
           const stored = localStorage.getItem('yt_workout_plans') || '{}';
           const map = JSON.parse(stored);
@@ -98,6 +99,7 @@ export default function HomePage() {
           {/* Hero Section */}
           <div className="text-center space-y-4 max-w-2xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] font-mono uppercase tracking-widest text-zinc-400">
+              <Sparkles className="w-3.5 h-3.5 text-zinc-400" />
               <span>{t('heroBadge')}</span>
             </div>
 
@@ -113,7 +115,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Main Input Component - Clean Utilitarian Style */}
+          {/* Main Input Component - Supporting Multi-Platforms */}
           <div className="minimal-card p-6 sm:p-8 space-y-6">
             <div className="space-y-3">
               <label className="text-[11px] font-mono uppercase tracking-wider font-semibold text-zinc-300 flex items-center gap-2">
@@ -212,9 +214,9 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-mono uppercase tracking-wider font-bold text-zinc-300 flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-zinc-400" />
-                <span>{lang === 'zh' ? '精选推荐视频教程' : 'Featured Video Tutorials'}</span>
+                <span>{lang === 'zh' ? '多平台精选视频教程 (B站 / 抖音 / YouTube)' : 'Featured Multi-Platform Tutorials'}</span>
               </h2>
-              <span className="text-[11px] text-zinc-500 font-mono">3 Featured Routines</span>
+              <span className="text-[11px] text-zinc-500 font-mono">Bilibili • Douyin • YouTube</span>
             </div>
 
             {/* Clean Video Cards List */}
@@ -258,8 +260,8 @@ export default function HomePage() {
           {/* Architecture Footer Highlights */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-zinc-800/80">
             <div className="p-3.5 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1">
-              <div className="text-[11px] font-mono font-bold text-zinc-300">01. Two-Stage LLM</div>
-              <p className="text-[11px] text-zinc-500">Actionable classification & exercise extraction.</p>
+              <div className="text-[11px] font-mono font-bold text-zinc-300">01. Multi-Platform</div>
+              <p className="text-[11px] text-zinc-500">Supports Bilibili, Douyin & YouTube links.</p>
             </div>
 
             <div className="p-3.5 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1">

@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchVideoMetadata, fetchTranscript, extractVideoId } from '@/lib/youtube';
+import { 
+  detectPlatform, 
+  extractPlatformVideoId, 
+  fetchBilibiliMetadata, 
+  fetchDouyinMetadata,
+  fetchPlatformTranscript 
+} from '@/lib/videoPlatforms';
 import { stage1Classification, stage2ExtractWorkout } from '@/lib/parser';
 import { saveWorkoutPlan } from '@/lib/storage';
 
@@ -9,18 +16,27 @@ export async function POST(req: NextRequest) {
     const { url, apiKey, customSubtitle } = body;
 
     if (!url || typeof url !== 'string') {
-      return NextResponse.json({ error: '请提供有效的 YouTube 视频链接' }, { status: 400 });
+      return NextResponse.json({ error: '请提供有效的视频链接 (支持 YouTube / B站 / 抖音)' }, { status: 400 });
     }
 
-    const videoId = extractVideoId(url);
+    const platform = detectPlatform(url);
+    const videoId = extractPlatformVideoId(url, platform);
+
     if (!videoId) {
-      return NextResponse.json({ error: '无法解析 YouTube 视频 ID，请检查链接格式' }, { status: 400 });
+      return NextResponse.json({ error: '无法解析视频 ID，请检查链接格式是否正确' }, { status: 400 });
     }
 
-    // 1. Fetch metadata
-    const metadata = await fetchVideoMetadata(url);
+    // 1. Fetch metadata based on platform
+    let metadata;
+    if (platform === 'bilibili') {
+      metadata = await fetchBilibiliMetadata(videoId, url);
+    } else if (platform === 'douyin') {
+      metadata = await fetchDouyinMetadata(videoId, url);
+    } else {
+      metadata = await fetchVideoMetadata(url);
+    }
 
-    // 2. Fetch transcript (or use custom pasted subtitle)
+    // 2. Fetch transcript or platform fallback
     let transcriptResult;
     if (customSubtitle && customSubtitle.trim() !== '') {
       transcriptResult = {
@@ -32,6 +48,8 @@ export async function POST(req: NextRequest) {
           text: customSubtitle
         }]
       };
+    } else if (platform === 'bilibili' || platform === 'douyin') {
+      transcriptResult = await fetchPlatformTranscript(videoId, platform, metadata.title);
     } else {
       transcriptResult = await fetchTranscript(videoId);
     }
@@ -55,6 +73,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       stage: 2,
+      platform,
       classification,
       transcript_source: transcriptResult.source_type,
       plan: workoutPlan
