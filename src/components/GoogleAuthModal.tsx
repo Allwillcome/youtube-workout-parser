@@ -3,14 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
+  GoogleOAuthProvider, 
+  GoogleLogin,
+  CredentialResponse
+} from '@react-oauth/google';
+import { 
   Key, 
-  ShieldCheck, 
   Lock, 
   Check, 
   X, 
-  User, 
   LogOut,
-  Sparkles
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
@@ -28,11 +32,32 @@ interface GoogleAuthModalProps {
   onClose: () => void;
 }
 
+// Decode Google Official JWT Credential Payload
+function jwtDecode(token: string): any {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
+
 export function GoogleAuthModal({ user, onLogin, onLogout, onClose }: GoogleAuthModalProps) {
-  const { lang, t } = useI18n();
+  const { lang } = useI18n();
   const [apiKey, setApiKey] = useState('');
   const [savedKey, setSavedKey] = useState(false);
+  const [manualEmail, setManualEmail] = useState('');
   const [mounted, setMounted] = useState(false);
+
+  // Default Google Client ID or env fallback
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1088492040182-samplegoogleclientid.apps.googleusercontent.com';
 
   useEffect(() => {
     setMounted(true);
@@ -41,14 +66,31 @@ export function GoogleAuthModal({ user, onLogin, onLogout, onClose }: GoogleAuth
     }
   }, [user]);
 
-  const handleSimulatedGoogleLogin = () => {
-    const mockUser: UserProfile = {
-      name: 'Fitness Member',
-      email: 'user@gmail.com',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+  const handleGoogleSuccess = (credentialResponse: CredentialResponse) => {
+    if (credentialResponse.credential) {
+      const payload = jwtDecode(credentialResponse.credential);
+      if (payload) {
+        const realUser: UserProfile = {
+          name: payload.name || payload.given_name || 'Google User',
+          email: payload.email || 'user@gmail.com',
+          avatar: payload.picture || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+          apiKey: apiKey
+        };
+        onLogin(realUser);
+      }
+    }
+  };
+
+  const handleManualEmailLogin = () => {
+    if (!manualEmail || !manualEmail.includes('@')) return;
+    const namePart = manualEmail.split('@')[0];
+    const newUser: UserProfile = {
+      name: namePart.charAt(0).toUpperCase() + namePart.slice(1),
+      email: manualEmail,
+      avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${manualEmail}`,
       apiKey: apiKey
     };
-    onLogin(mockUser);
+    onLogin(newUser);
   };
 
   const handleSaveApiKey = () => {
@@ -63,128 +105,151 @@ export function GoogleAuthModal({ user, onLogin, onLogout, onClose }: GoogleAuth
   if (!mounted) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[99999] bg-zinc-950/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="fixed inset-0" onClick={onClose} />
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <div className="fixed inset-0 z-[99999] bg-zinc-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0" onClick={onClose} />
 
-      <div className="minimal-card p-6 max-w-md w-full space-y-5 animate-minimal-fade relative z-10 my-auto border border-zinc-800 shadow-2xl bg-zinc-900">
-        
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-200 p-1.5 rounded hover:bg-zinc-800 transition-colors btn-minimal-secondary"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        <div className="minimal-card p-6 max-w-md w-full space-y-5 animate-minimal-fade relative z-10 my-auto border border-zinc-800 shadow-2xl bg-zinc-900">
+          
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-200 p-1.5 rounded hover:bg-zinc-800 transition-colors btn-minimal-secondary"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
-        {/* Modal Header */}
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
-            <Sparkles className="w-3 h-3 text-zinc-400" />
-            <span>{lang === 'zh' ? '账号身份与密钥保险箱' : 'Identity & Key Vault'}</span>
-          </div>
-
-          <h2 className="text-base font-mono uppercase tracking-wider font-bold text-zinc-100">
-            {user ? (lang === 'zh' ? '个人密钥管理' : 'Key Vault Settings') : (lang === 'zh' ? '登录 Google 账号' : 'Google Auth Login')}
-          </h2>
-        </div>
-
-        {/* User Logged In Status */}
-        {user ? (
-          <div className="space-y-4">
-            <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-md flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img 
-                  src={user.avatar} 
-                  alt={user.name} 
-                  className="w-10 h-10 rounded-full border border-zinc-700 object-cover"
-                />
-                <div>
-                  <div className="text-xs font-bold text-zinc-100">{user.name}</div>
-                  <div className="text-[11px] text-zinc-400 font-mono">{user.email}</div>
-                </div>
-              </div>
-
-              <button
-                onClick={onLogout}
-                className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"
-                title="Sign Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+          {/* Modal Header */}
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
+              <Sparkles className="w-3 h-3 text-zinc-400" />
+              <span>{lang === 'zh' ? 'Google 官方登录与密钥保险箱' : 'Official Google Auth & Key Vault'}</span>
             </div>
 
-            {/* API Key Vault Management */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-mono text-zinc-300 font-semibold uppercase flex items-center gap-1.5">
-                <Key className="w-3.5 h-3.5 text-zinc-400" />
-                <span>{lang === 'zh' ? '专属个人 API 密钥 (OpenAI / DeepSeek)' : 'Personal API Key'}</span>
-              </label>
+            <h2 className="text-base font-mono uppercase tracking-wider font-bold text-zinc-100">
+              {user ? (lang === 'zh' ? '个人密钥管理' : 'Key Vault Settings') : (lang === 'zh' ? '登录 Google 账号' : 'Google Auth Login')}
+            </h2>
+          </div>
 
-              <div className="flex items-center gap-2">
-                <input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="sk-proj-..."
-                  className="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600 font-mono"
-                />
+          {/* User Logged In Status */}
+          {user ? (
+            <div className="space-y-4">
+              <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-md flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img 
+                    src={user.avatar} 
+                    alt={user.name} 
+                    className="w-10 h-10 rounded-full border border-zinc-700 object-cover"
+                  />
+                  <div>
+                    <div className="text-xs font-bold text-zinc-100">{user.name}</div>
+                    <div className="text-[11px] text-zinc-400 font-mono">{user.email}</div>
+                  </div>
+                </div>
+
                 <button
-                  onClick={handleSaveApiKey}
-                  className="px-4 py-2 btn-minimal text-xs shrink-0 flex items-center gap-1"
+                  onClick={onLogout}
+                  className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"
+                  title="Sign Out"
                 >
-                  {savedKey ? <Check className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-                  <span>{savedKey ? (lang === 'zh' ? '已保存' : 'Saved!') : (lang === 'zh' ? '记住密钥' : 'Save Key')}</span>
+                  <LogOut className="w-4 h-4" />
                 </button>
               </div>
 
-              <p className="text-[10px] text-zinc-500">
+              {/* API Key Vault Management */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-mono text-zinc-300 font-semibold uppercase flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>{lang === 'zh' ? '专属个人 API 密钥 (OpenAI / DeepSeek)' : 'Personal API Key'}</span>
+                </label>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="sk-proj-..."
+                    className="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600 font-mono"
+                  />
+                  <button
+                    onClick={handleSaveApiKey}
+                    className="px-4 py-2 btn-minimal text-xs shrink-0 flex items-center gap-1"
+                  >
+                    {savedKey ? <Check className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                    <span>{savedKey ? (lang === 'zh' ? '已保存' : 'Saved!') : (lang === 'zh' ? '记住密钥' : 'Save Key')}</span>
+                  </button>
+                </div>
+
+                <p className="text-[10px] text-zinc-500">
+                  {lang === 'zh' 
+                    ? '🔒 密钥加密存储在您的个人 Vault 中，解析新视频时系统自动无感调用。' 
+                    : '🔒 API Key encrypted in your personal vault. Auto-applied during parsing.'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            /* Official Google Login Button & Email Authorization */
+            <div className="space-y-4 pt-1">
+              <p className="text-xs text-zinc-400">
                 {lang === 'zh' 
-                  ? '🔒 密钥已加密存储在您的个人安全 Vault 中。解析任何视频时系统将自动无感调用。' 
-                  : '🔒 API Key encrypted in your personal vault. Auto-applied during parsing.'}
+                  ? '点击下方 Google 官方登录按钮，弹窗授权您的 Google 账号：' 
+                  : 'Click below to authorize via official Google Identity Services:'}
               </p>
-            </div>
-          </div>
-        ) : (
-          /* Google Login Quick Button */
-          <div className="space-y-4 pt-1">
-            <p className="text-xs text-zinc-400">
-              {lang === 'zh' 
-                ? '登录 Google 账号后，您可以保存个人 OpenAI / DeepSeek 密钥，解析新视频时无需重复输入！' 
-                : 'Sign in to save your personal API Keys for seamless one-click video parsing!'}
-            </p>
 
+              {/* Official Google OAuth Widget */}
+              <div className="flex justify-center py-2 bg-zinc-950 p-3 rounded-md border border-zinc-800">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => console.warn('Google Login Failed')}
+                  useOneTap
+                  theme="filled_black"
+                  shape="rectangular"
+                  text="signin_with"
+                />
+              </div>
+
+              {/* Direct Gmail Input Fallback */}
+              <div className="pt-2 border-t border-zinc-800/80 space-y-2">
+                <label className="text-[11px] font-mono text-zinc-400">
+                  {lang === 'zh' ? '或手动绑定您的 Google / Gmail 邮箱：' : 'Or enter your Gmail address:'}
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="email"
+                    value={manualEmail}
+                    onChange={(e) => setManualEmail(e.target.value)}
+                    placeholder="yourname@gmail.com"
+                    className="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600 font-mono"
+                  />
+                  <button
+                    onClick={handleManualEmailLogin}
+                    className="px-3.5 py-2 btn-minimal text-xs shrink-0"
+                  >
+                    {lang === 'zh' ? '绑定邮箱' : 'Bind'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-1 text-[10px] text-zinc-500 text-center flex items-center justify-center gap-1">
+                <ShieldCheck className="w-3 h-3 text-zinc-500" />
+                <span>Google OAuth 2.0 Identity Protocol</span>
+              </div>
+            </div>
+          )}
+
+          {/* Footer Close */}
+          <div className="flex justify-end pt-2 border-t border-zinc-800">
             <button
-              onClick={handleSimulatedGoogleLogin}
-              className="w-full py-3 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-md text-xs font-semibold text-zinc-100 flex items-center justify-center gap-2.5 btn-minimal-secondary transition-all"
+              onClick={onClose}
+              className="px-4 py-1.5 bg-zinc-900 text-zinc-300 text-xs font-medium rounded btn-minimal-secondary"
             >
-              {/* Google SVG Icon */}
-              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/>
-                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
-                <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-2.9z"/>
-                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
-              </svg>
-              <span>{lang === 'zh' ? '使用 Google 账号快捷登录' : 'Sign in with Google'}</span>
+              {lang === 'zh' ? '关闭' : 'Close'}
             </button>
-
-            <div className="pt-2 border-t border-zinc-800 text-[10px] text-zinc-500 text-center">
-              Secured with OAuth 2.0 Auth Protocol
-            </div>
           </div>
-        )}
 
-        {/* Footer Close */}
-        <div className="flex justify-end pt-2 border-t border-zinc-800">
-          <button
-            onClick={onClose}
-            className="px-4 py-1.5 bg-zinc-900 text-zinc-300 text-xs font-medium rounded btn-minimal-secondary"
-          >
-            {lang === 'zh' ? '完成' : 'Done'}
-          </button>
         </div>
-
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 
   return createPortal(modalContent, document.body);
